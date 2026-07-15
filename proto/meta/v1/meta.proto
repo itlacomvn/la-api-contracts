@@ -1,0 +1,226 @@
+syntax = "proto3";
+
+package meta.v1;
+
+import "common/v1/common.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/itlacomvn/la-api-contracts/gen/go/meta/v1;metav1";
+
+service MetaService {
+  rpc GetTenant(GetTenantRequest) returns (GetTenantResponse);
+  rpc ListTenants(ListTenantsRequest) returns (ListTenantsResponse);
+  rpc GetTenantsByIDs(GetTenantsByIDsRequest) returns (GetTenantsByIDsResponse);
+  rpc GetOrganizationUnit(GetOrganizationUnitRequest) returns (GetOrganizationUnitResponse);
+  rpc ListOrganizationUnits(ListOrganizationUnitsRequest) returns (ListOrganizationUnitsResponse);
+  rpc GetOrganizationUnitsByIDs(GetOrganizationUnitsByIDsRequest) returns (GetOrganizationUnitsByIDsResponse);
+  rpc GetPartnersByIDs(GetPartnersByIDsRequest) returns (GetPartnersByIDsResponse);
+  rpc GetAnalyticAccountsByIDs(GetAnalyticAccountsByIDsRequest) returns (GetAnalyticAccountsByIDsResponse);
+  rpc GetEmployeeChecklistsByIDs(GetEmployeeChecklistsByIDsRequest) returns (GetEmployeeChecklistsByIDsResponse);
+  rpc GetMetadataByIDs(GetMetadataByIDsRequest) returns (GetMetadataByIDsResponse);
+  rpc CreateAnalyticAccount(CreateAnalyticAccountRequest) returns (CreateAnalyticAccountResponse);
+  rpc UpdateAnalyticAccountPartner(UpdateAnalyticAccountPartnerRequest) returns (UpdateAnalyticAccountPartnerResponse);
+}
+
+service AddressService {
+  rpc GetProvincesByIDs(GetProvincesByIDsRequest) returns (GetProvincesByIDsResponse);
+  rpc GetDistrictsByIDs(GetDistrictsByIDsRequest) returns (GetDistrictsByIDsResponse);
+  rpc GetWardsByIDs(GetWardsByIDsRequest) returns (GetWardsByIDsResponse);
+}
+
+message TenantInfo {
+  string id = 1;
+  google.protobuf.Int64Value odoo_company_id = 2;
+  string name = 3;
+  google.protobuf.StringValue partner_id = 4;
+}
+
+message OrganizationUnitInfo {
+  string id = 1;
+  google.protobuf.Int64Value odoo_department_id = 2;
+  string type = 3;
+  string name = 4;
+  string code = 5;
+  string complete_name = 8;
+  google.protobuf.StringValue parent_id = 6;
+  string tenant_id = 7;
+}
+
+message PartnerInfo {
+  string id = 1;
+  google.protobuf.Int64Value odoo_partner_id = 2;
+  string name = 3;
+  string display_name = 4;
+  string ref = 5;
+}
+
+message AnalyticAccountInfo {
+  string id = 1;
+  google.protobuf.Int64Value odoo_analytic_account_id = 2;
+  string code = 3;
+  string name = 4;
+  google.protobuf.StringValue partner_id = 5;
+  PartnerInfo partner = 6;
+}
+
+message EmployeeChecklistInfo {
+  string id = 1;
+  string name = 2;
+  string code = 3;
+}
+
+message MetadataInfo {
+  string id = 1;
+  string type = 2;
+  string name = 3;
+  string code = 4;
+}
+
+message ProvinceInfo {
+  string id = 1;
+  google.protobuf.Int64Value odoo_state_id = 2;
+  string name = 3;
+  string code = 4;
+}
+
+message DistrictInfo {
+  string id = 1;
+  google.protobuf.Int64Value odoo_district_id = 2;
+  string name = 3;
+  string code = 4;
+  string province_id = 5;
+}
+
+message WardInfo {
+  string id = 1;
+  google.protobuf.Int64Value odoo_ward_id = 2;
+  string name = 3;
+  string code = 4;
+  string district_id = 5;
+}
+
+message GetTenantRequest {
+  string id = 1;
+}
+
+message GetTenantResponse {
+  TenantInfo tenant = 1;
+}
+
+message ListTenantsRequest {
+  common.v1.PageRequest page = 1;
+}
+
+message ListTenantsResponse {
+  repeated TenantInfo tenants = 1;
+}
+
+message GetTenantsByIDsRequest {
+  common.v1.UUIDList ids = 1;
+}
+
+message GetTenantsByIDsResponse {
+  map<string, TenantInfo> tenants = 1;
+}
+
+message GetOrganizationUnitRequest {
+  string id = 1;
+}
+
+message GetOrganizationUnitResponse {
+  OrganizationUnitInfo organization_unit = 1;
+}
+
+message ListOrganizationUnitsRequest {
+  string type = 1;
+  google.protobuf.StringValue parent_id = 2;
+  google.protobuf.StringValue tenant_id = 3;
+  google.protobuf.BoolValue active = 4;
+  common.v1.PageRequest page = 5;
+}
+
+message ListOrganizationUnitsResponse {
+  repeated OrganizationUnitInfo organization_units = 1;
+}
+
+message GetOrganizationUnitsByIDsRequest {
+  common.v1.UUIDList ids = 1;
+}
+
+message GetOrganizationUnitsByIDsResponse {
+  map<string, OrganizationUnitInfo> organization_units = 1;
+}
+
+message GetPartnersByIDsRequest {
+  common.v1.UUIDList ids = 1;
+}
+
+message GetPartnersByIDsResponse {
+  map<string, PartnerInfo> partners = 1;
+}
+
+message GetAnalyticAccountsByIDsRequest {
+  common.v1.UUIDList ids = 1;
+}
+
+message GetAnalyticAccountsByIDsResponse {
+  map<string, AnalyticAccountInfo> analytic_accounts = 1;
+}
+
+message GetEmployeeChecklistsByIDsRequest {
+  common.v1.UUIDList ids = 1;
+}
+
+message GetEmployeeChecklistsByIDsResponse {
+  map<string, EmployeeChecklistInfo> employee_checklists = 1;
+}
+
+message GetMetadataByIDsRequest {
+  common.v1.UUIDList ids = 1;
+}
+
+message GetMetadataByIDsResponse {
+  map<string, MetadataInfo> metadata = 1;
+}
+
+message CreateAnalyticAccountRequest {
+  string name = 1;
+  google.protobuf.StringValue code = 2;
+  google.protobuf.StringValue partner_id = 3;
+  string tenant_id = 4;
+}
+
+message CreateAnalyticAccountResponse {
+  AnalyticAccountInfo analytic_account = 1;
+}
+
+message UpdateAnalyticAccountPartnerRequest {
+  string analytic_account_id = 1;
+  string partner_id = 2;
+}
+
+message UpdateAnalyticAccountPartnerResponse {}
+
+message GetProvincesByIDsRequest {
+  common.v1.UUIDList ids = 1;
+}
+
+message GetProvincesByIDsResponse {
+  map<string, ProvinceInfo> provinces = 1;
+}
+
+message GetDistrictsByIDsRequest {
+  common.v1.UUIDList ids = 1;
+}
+
+message GetDistrictsByIDsResponse {
+  map<string, DistrictInfo> districts = 1;
+}
+
+message GetWardsByIDsRequest {
+  common.v1.UUIDList ids = 1;
+}
+
+message GetWardsByIDsResponse {
+  map<string, WardInfo> wards = 1;
+}

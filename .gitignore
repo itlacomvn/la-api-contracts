@@ -1,0 +1,4 @@
+.DS_Store
+
+# LƯU Ý: gen/ được commit có chủ đích — consumer không chạy buf,
+# họ chỉ tải file .go về. Đừng ignore thư mục này.

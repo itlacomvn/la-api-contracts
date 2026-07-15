@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package identity.v1;
+
+import "common/v1/common.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/itlacomvn/la-api-contracts/gen/go/identity/v1;identityv1";
+
+service IdentityService {
+  rpc GetUserBySSO(GetUserBySSORequest) returns (GetUserBySSOResponse);
+  rpc FindOrCreateUser(FindOrCreateUserRequest) returns (FindOrCreateUserResponse);
+  rpc ResolveOdooUsers(ResolveOdooUsersRequest) returns (ResolveOdooUsersResponse);
+  rpc GetUsersByIDs(GetUsersByIDsRequest) returns (GetUsersByIDsResponse);
+}
+
+message UserInfo {
+  string id = 1;
+  string username = 2;
+  string email = 3;
+  string display_name = 4;
+  string identification = 5;
+  google.protobuf.Int64Value odoo_user_id = 6;
+}
+
+message GetUserBySSORequest {
+  string sso_id = 1;
+}
+
+message GetUserBySSOResponse {
+  UserInfo user = 1;
+}
+
+message FindOrCreateUserRequest {
+  string sso_id = 1;
+  string username = 2;
+  string email = 3;
+  string display_name = 4;
+}
+
+message FindOrCreateUserResponse {
+  UserInfo user = 1;
+}
+
+message ResolveOdooUsersRequest {
+  common.v1.OdooIDList ids = 1;
+}
+
+message ResolveOdooUsersResponse {
+  map<int64, UserInfo> users = 1;
+}
+
+message GetUsersByIDsRequest {
+  common.v1.UUIDList ids = 1;
+}
+
+message GetUsersByIDsResponse {
+  map<string, UserInfo> users = 1;
+}

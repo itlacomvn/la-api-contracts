@@ -1,0 +1,15 @@
+version: v2
+# Managed mode tắt: go_package được khai báo tường minh trong từng .proto,
+# bật managed sẽ ghi đè và làm mất alias (accountv1, commonv1, ...).
+#
+# Mỗi ngôn ngữ gen vào gen/<lang>/ riêng. Thêm ngôn ngữ mới = thêm plugin, ví dụ:
+#   - remote: buf.build/protocolbuffers/python
+#     out: gen/python
+plugins:
+  # --- go ---
+  - remote: buf.build/protocolbuffers/go
+    out: gen/go
+    opt: paths=source_relative
+  - remote: buf.build/grpc/go
+    out: gen/go
+    opt: paths=source_relative

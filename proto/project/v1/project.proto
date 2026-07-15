@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package project.v1;
+
+import "common/v1/common.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/itlacomvn/la-api-contracts/gen/go/project/v1;projectv1";
+
+service ProjectService {
+  rpc GetProject(GetProjectRequest) returns (GetProjectResponse);
+  rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
+}
+
+service PolicyService {
+  rpc GetPolicy(GetPolicyRequest) returns (GetPolicyResponse);
+  rpc ListPoliciesByProject(ListPoliciesByProjectRequest) returns (ListPoliciesByProjectResponse);
+}
+
+message ProjectInfo {
+  string id = 1;
+  string name = 2;
+  string code = 3;
+  bool active = 4;
+  string project_type = 5;
+  string tenant_id = 6;
+  google.protobuf.StringValue manager_user_id = 7;
+  google.protobuf.StringValue hrbp_user_id = 8;
+  google.protobuf.StringValue company_analytic_account_id = 9;
+  google.protobuf.StringValue analytic_account_id = 10;
+  string description = 11;
+  google.protobuf.Int64Value odoo_project_id = 12;
+}
+
+message PolicyInfo {
+  string id = 1;
+  string name = 2;
+  string code = 3;
+  string project_id = 4;
+  string project_name = 5;
+  string state = 6;
+}
+
+message GetProjectRequest {
+  string id = 1;
+}
+
+message GetProjectResponse {
+  ProjectInfo project = 1;
+}
+
+message ListProjectsRequest {
+  google.protobuf.BoolValue active = 1;
+  google.protobuf.StringValue tenant_id = 2;
+  common.v1.PageRequest page = 3;
+}
+
+message ListProjectsResponse {
+  repeated ProjectInfo projects = 1;
+}
+
+message GetPolicyRequest {
+  string id = 1;
+}
+
+message GetPolicyResponse {
+  PolicyInfo policy = 1;
+}
+
+message ListPoliciesByProjectRequest {
+  string project_id = 1;
+}
+
+message ListPoliciesByProjectResponse {
+  repeated PolicyInfo policies = 1;
+}

@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package employee.v1;
+
+import "common/v1/common.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/itlacomvn/la-api-contracts/gen/go/employee/v1;employeev1";
+
+service EmployeeService {
+  rpc GetEmployee(GetEmployeeRequest) returns (GetEmployeeResponse);
+  rpc GetEmployeesByIDs(GetEmployeesByIDsRequest) returns (GetEmployeesByIDsResponse);
+  rpc ListEmployees(ListEmployeesRequest) returns (ListEmployeesResponse);
+}
+
+message EmployeeInfo {
+  string id = 1;
+  string code = 2;
+  string name = 3;
+  bool active = 4;
+  string tenant_id = 5;
+  google.protobuf.StringValue address_home_id = 6;
+  google.protobuf.StringValue email = 7;
+  google.protobuf.StringValue mobile = 8;
+  google.protobuf.StringValue gender = 9;
+  google.protobuf.Int64Value odoo_employee_id = 10;
+}
+
+message GetEmployeeRequest {
+  string id = 1;
+}
+
+message GetEmployeeResponse {
+  EmployeeInfo employee = 1;
+}
+
+message GetEmployeesByIDsRequest {
+  common.v1.UUIDList ids = 1;
+}
+
+message GetEmployeesByIDsResponse {
+  map<string, EmployeeInfo> employees = 1;
+}
+
+message ListEmployeesRequest {
+  google.protobuf.BoolValue active = 1;
+  google.protobuf.StringValue tenant_id = 2;
+  common.v1.PageRequest page = 3;
+}
+
+message ListEmployeesResponse {
+  repeated EmployeeInfo employees = 1;
+}

@@ -1,0 +1,141 @@
+syntax = "proto3";
+
+package account.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+
+option go_package = "github.com/itlacomvn/la-api-contracts/gen/go/account/v1;accountv1";
+
+// AccountService is the primary internal API. Other services (monolith,
+// gateway, future microservices) resolve users through this service — never
+// through the Keycloak Admin API directly (see spec §2).
+service AccountService {
+  // Lookup an account by internal id, keycloak_id, email or username.
+  rpc GetAccount(GetAccountRequest) returns (Account);
+
+  // Batch lookup — resolve up to 200 users in a single call.
+  rpc BatchGetAccounts(BatchGetAccountsRequest) returns (BatchGetAccountsResponse);
+
+  // JIT provisioning: called after a user logs in for the first time.
+  // Idempotent — calling again with the same keycloak_id returns the existing account.
+  rpc EnsureAccount(EnsureAccountRequest) returns (Account);
+
+  rpc UpdateProfile(UpdateProfileRequest) returns (Account);
+
+  rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse);
+
+  // Change business status; the service syncs enabled/disabled to Keycloak.
+  rpc SetAccountStatus(SetAccountStatusRequest) returns (Account);
+}
+
+// OdooMappingService is deliberately separate so it can be removed cleanly once
+// the Odoo migration is complete (spec §5, §10.4).
+service OdooMappingService {
+  rpc GetAccountByOdooUser(GetAccountByOdooUserRequest) returns (Account);
+  rpc GetOdooMapping(GetOdooMappingRequest) returns (OdooMapping);
+  rpc UpsertOdooMapping(UpsertOdooMappingRequest) returns (OdooMapping);
+}
+
+message Account {
+  string id = 1; // internal UUID — other services store FK by this value
+  string keycloak_id = 2;
+  string email = 3;
+  string username = 4;
+  AccountStatus status = 5;
+  Profile profile = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+enum AccountStatus {
+  ACCOUNT_STATUS_UNSPECIFIED = 0;
+  ACCOUNT_STATUS_ACTIVE = 1;
+  ACCOUNT_STATUS_SUSPENDED = 2;
+  ACCOUNT_STATUS_DEACTIVATED = 3;
+}
+
+message Profile {
+  string full_name = 1;
+  string display_name = 2;
+  string phone = 3;
+  string avatar_url = 4;
+  string locale = 5;
+  string timezone = 6;
+  map<string, string> attributes = 7;
+}
+
+message GetAccountRequest {
+  oneof lookup {
+    string id = 1;
+    string keycloak_id = 2;
+    string email = 3;
+    string username = 4;
+  }
+}
+
+message BatchGetAccountsRequest {
+  repeated string ids = 1; // max 200
+}
+message BatchGetAccountsResponse {
+  repeated Account accounts = 1;
+}
+
+message EnsureAccountRequest {
+  string keycloak_id = 1;
+  string email = 2;
+  string username = 3;
+  string full_name = 4;
+  string identity_provider = 5; // broker claim: "ms365" | "odoo" | "" (local)
+  OdooHint odoo_hint = 6;       // optional, only when logging in via Odoo OAuth2
+}
+message OdooHint {
+  string odoo_db = 1;
+  int32 odoo_user_id = 2;
+  string odoo_login = 3;
+}
+
+message UpdateProfileRequest {
+  string account_id = 1;
+  Profile profile = 2;
+  google.protobuf.FieldMask update_mask = 3;
+}
+
+message ListAccountsRequest {
+  int32 page_size = 1;      // default 50, max 500
+  string page_token = 2;
+  AccountStatus status = 3; // optional filter
+  string query = 4;         // search by email/username/full_name
+}
+message ListAccountsResponse {
+  repeated Account accounts = 1;
+  string next_page_token = 2;
+}
+
+message SetAccountStatusRequest {
+  string account_id = 1;
+  AccountStatus status = 2;
+  string reason = 3;
+}
+
+message GetAccountByOdooUserRequest {
+  string odoo_db = 1;
+  int32 odoo_user_id = 2;
+}
+message GetOdooMappingRequest {
+  string account_id = 1;
+  string odoo_db = 2;
+}
+message UpsertOdooMappingRequest {
+  string account_id = 1;
+  string odoo_db = 2;
+  int32 odoo_user_id = 3;
+  string odoo_login = 4;
+}
+message OdooMapping {
+  string account_id = 1;
+  string odoo_db = 2;
+  int32 odoo_user_id = 3;
+  string odoo_login = 4;
+  google.protobuf.Timestamp synced_at = 5;
+}

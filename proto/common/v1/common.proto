@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package common.v1;
+
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/itlacomvn/la-api-contracts/gen/go/common/v1;commonv1";
+
+message PageRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+  string search = 3;
+}
+
+message UUIDList {
+  repeated string ids = 1;
+}
+
+message OdooIDList {
+  repeated int64 ids = 1;
+}
+
+message OptionalBoolFilter {
+  google.protobuf.BoolValue value = 1;
+}
