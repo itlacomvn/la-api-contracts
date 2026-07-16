@@ -470,15 +470,14 @@ func (x *BatchGetAccountsResponse) GetAccounts() []*Account {
 }
 
 type EnsureAccountRequest struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	KeycloakId       string                 `protobuf:"bytes,1,opt,name=keycloak_id,json=keycloakId,proto3" json:"keycloak_id,omitempty"`
-	Email            string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	Username         string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
-	FullName         string                 `protobuf:"bytes,4,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
-	IdentityProvider string                 `protobuf:"bytes,5,opt,name=identity_provider,json=identityProvider,proto3" json:"identity_provider,omitempty"` // broker claim: "ms365" | "odoo" | "" (local)
-	OdooHint         *OdooHint              `protobuf:"bytes,6,opt,name=odoo_hint,json=odooHint,proto3" json:"odoo_hint,omitempty"`                         // optional, only when logging in via Odoo OAuth2
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	KeycloakId    string                 `protobuf:"bytes,1,opt,name=keycloak_id,json=keycloakId,proto3" json:"keycloak_id,omitempty"`
+	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
+	FullName      string                 `protobuf:"bytes,4,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
+	OdooHint      *OdooHint              `protobuf:"bytes,5,opt,name=odoo_hint,json=odooHint,proto3" json:"odoo_hint,omitempty"` // optional, only when logging in via Odoo OAuth2
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *EnsureAccountRequest) Reset() {
@@ -535,13 +534,6 @@ func (x *EnsureAccountRequest) GetUsername() string {
 func (x *EnsureAccountRequest) GetFullName() string {
 	if x != nil {
 		return x.FullName
-	}
-	return ""
-}
-
-func (x *EnsureAccountRequest) GetIdentityProvider() string {
-	if x != nil {
-		return x.IdentityProvider
 	}
 	return ""
 }
@@ -1143,15 +1135,14 @@ const file_account_v1_account_proto_rawDesc = "" +
 	"\x17BatchGetAccountsRequest\x12\x10\n" +
 	"\x03ids\x18\x01 \x03(\tR\x03ids\"K\n" +
 	"\x18BatchGetAccountsResponse\x12/\n" +
-	"\baccounts\x18\x01 \x03(\v2\x13.account.v1.AccountR\baccounts\"\xe6\x01\n" +
+	"\baccounts\x18\x01 \x03(\v2\x13.account.v1.AccountR\baccounts\"\xb9\x01\n" +
 	"\x14EnsureAccountRequest\x12\x1f\n" +
 	"\vkeycloak_id\x18\x01 \x01(\tR\n" +
 	"keycloakId\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +
 	"\busername\x18\x03 \x01(\tR\busername\x12\x1b\n" +
-	"\tfull_name\x18\x04 \x01(\tR\bfullName\x12+\n" +
-	"\x11identity_provider\x18\x05 \x01(\tR\x10identityProvider\x121\n" +
-	"\todoo_hint\x18\x06 \x01(\v2\x14.account.v1.OdooHintR\bodooHint\"d\n" +
+	"\tfull_name\x18\x04 \x01(\tR\bfullName\x121\n" +
+	"\todoo_hint\x18\x05 \x01(\v2\x14.account.v1.OdooHintR\bodooHint\"d\n" +
 	"\bOdooHint\x12\x17\n" +
 	"\aodoo_db\x18\x01 \x01(\tR\x06odooDb\x12 \n" +
 	"\fodoo_user_id\x18\x02 \x01(\x05R\n" +
