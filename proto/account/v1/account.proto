@@ -86,8 +86,7 @@ message EnsureAccountRequest {
   string email = 2;
   string username = 3;
   string full_name = 4;
-  string identity_provider = 5; // broker claim: "ms365" | "odoo" | "" (local)
-  OdooHint odoo_hint = 6;       // optional, only when logging in via Odoo OAuth2
+  OdooHint odoo_hint = 5;       // optional, only when logging in via Odoo OAuth2
 }
 message OdooHint {
   string odoo_db = 1;
