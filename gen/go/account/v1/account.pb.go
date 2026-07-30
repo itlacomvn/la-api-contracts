@@ -75,6 +75,58 @@ func (AccountStatus) EnumDescriptor() ([]byte, []int) {
 	return file_account_v1_account_proto_rawDescGZIP(), []int{0}
 }
 
+type DevicePlatform int32
+
+const (
+	DevicePlatform_DEVICE_PLATFORM_UNSPECIFIED DevicePlatform = 0
+	DevicePlatform_DEVICE_PLATFORM_WEB         DevicePlatform = 1
+	DevicePlatform_DEVICE_PLATFORM_ANDROID     DevicePlatform = 2
+	DevicePlatform_DEVICE_PLATFORM_IOS         DevicePlatform = 3
+)
+
+// Enum value maps for DevicePlatform.
+var (
+	DevicePlatform_name = map[int32]string{
+		0: "DEVICE_PLATFORM_UNSPECIFIED",
+		1: "DEVICE_PLATFORM_WEB",
+		2: "DEVICE_PLATFORM_ANDROID",
+		3: "DEVICE_PLATFORM_IOS",
+	}
+	DevicePlatform_value = map[string]int32{
+		"DEVICE_PLATFORM_UNSPECIFIED": 0,
+		"DEVICE_PLATFORM_WEB":         1,
+		"DEVICE_PLATFORM_ANDROID":     2,
+		"DEVICE_PLATFORM_IOS":         3,
+	}
+)
+
+func (x DevicePlatform) Enum() *DevicePlatform {
+	p := new(DevicePlatform)
+	*p = x
+	return p
+}
+
+func (x DevicePlatform) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (DevicePlatform) Descriptor() protoreflect.EnumDescriptor {
+	return file_account_v1_account_proto_enumTypes[1].Descriptor()
+}
+
+func (DevicePlatform) Type() protoreflect.EnumType {
+	return &file_account_v1_account_proto_enumTypes[1]
+}
+
+func (x DevicePlatform) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use DevicePlatform.Descriptor instead.
+func (DevicePlatform) EnumDescriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{1}
+}
+
 type Account struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // internal UUID — other services store FK by this value
@@ -845,6 +897,467 @@ func (x *SetAccountStatusRequest) GetReason() string {
 	return ""
 }
 
+// DeviceToken is one push registration token bound to one account. The token
+// identifies a browser/device, not a user — the same browser hands the same
+// token to whoever logs in next — so (app_id, token) is globally unique and a
+// token can belong to only one account at a time.
+type DeviceToken struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	AppId         string                 `protobuf:"bytes,2,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
+	Platform      DevicePlatform         `protobuf:"varint,3,opt,name=platform,proto3,enum=account.v1.DevicePlatform" json:"platform,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	LastSeenAt    *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=last_seen_at,json=lastSeenAt,proto3" json:"last_seen_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeviceToken) Reset() {
+	*x = DeviceToken{}
+	mi := &file_account_v1_account_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeviceToken) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeviceToken) ProtoMessage() {}
+
+func (x *DeviceToken) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeviceToken.ProtoReflect.Descriptor instead.
+func (*DeviceToken) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *DeviceToken) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *DeviceToken) GetAppId() string {
+	if x != nil {
+		return x.AppId
+	}
+	return ""
+}
+
+func (x *DeviceToken) GetPlatform() DevicePlatform {
+	if x != nil {
+		return x.Platform
+	}
+	return DevicePlatform_DEVICE_PLATFORM_UNSPECIFIED
+}
+
+func (x *DeviceToken) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *DeviceToken) GetLastSeenAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LastSeenAt
+	}
+	return nil
+}
+
+// AccountDeviceTokens is the COMPLETE token set of one account after a mutation
+// completes — a snapshot, not a delta — scoped to the app_id of the request.
+// Callers full-replace their downstream state from it (e.g. Novu
+// PUT /v1/subscribers/{id}/credentials overwrites the whole deviceTokens array).
+type AccountDeviceTokens struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AccountId     string                 `protobuf:"bytes,1,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
+	Tokens        []string               `protobuf:"bytes,2,rep,name=tokens,proto3" json:"tokens,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AccountDeviceTokens) Reset() {
+	*x = AccountDeviceTokens{}
+	mi := &file_account_v1_account_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AccountDeviceTokens) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AccountDeviceTokens) ProtoMessage() {}
+
+func (x *AccountDeviceTokens) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AccountDeviceTokens.ProtoReflect.Descriptor instead.
+func (*AccountDeviceTokens) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *AccountDeviceTokens) GetAccountId() string {
+	if x != nil {
+		return x.AccountId
+	}
+	return ""
+}
+
+func (x *AccountDeviceTokens) GetTokens() []string {
+	if x != nil {
+		return x.Tokens
+	}
+	return nil
+}
+
+type RegisterDeviceTokenRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AccountId     string                 `protobuf:"bytes,1,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`              // required
+	Token         string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`                                       // required — FCM/APNs registration token
+	AppId         string                 `protobuf:"bytes,3,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                          // required — per-application namespace, e.g. "esign-hub"
+	Platform      DevicePlatform         `protobuf:"varint,4,opt,name=platform,proto3,enum=account.v1.DevicePlatform" json:"platform,omitempty"` // optional; unspecified never overwrites a known platform
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RegisterDeviceTokenRequest) Reset() {
+	*x = RegisterDeviceTokenRequest{}
+	mi := &file_account_v1_account_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegisterDeviceTokenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterDeviceTokenRequest) ProtoMessage() {}
+
+func (x *RegisterDeviceTokenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterDeviceTokenRequest.ProtoReflect.Descriptor instead.
+func (*RegisterDeviceTokenRequest) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *RegisterDeviceTokenRequest) GetAccountId() string {
+	if x != nil {
+		return x.AccountId
+	}
+	return ""
+}
+
+func (x *RegisterDeviceTokenRequest) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *RegisterDeviceTokenRequest) GetAppId() string {
+	if x != nil {
+		return x.AppId
+	}
+	return ""
+}
+
+func (x *RegisterDeviceTokenRequest) GetPlatform() DevicePlatform {
+	if x != nil {
+		return x.Platform
+	}
+	return DevicePlatform_DEVICE_PLATFORM_UNSPECIFIED
+}
+
+type RegisterDeviceTokenResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Owner *AccountDeviceTokens   `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"` // the registering account and its full token set
+	// Accounts the token was taken away from, each with its REMAINING tokens.
+	// The (app_id, token) uniqueness invariant means there is at most one prior
+	// owner, so this holds 0 or 1 entry — repeated only for forward compatibility.
+	// An account left with zero tokens is still returned, with an empty list:
+	// that entry is what tells the caller to clear the old subscriber.
+	Revoked       []*AccountDeviceTokens `protobuf:"bytes,2,rep,name=revoked,proto3" json:"revoked,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RegisterDeviceTokenResponse) Reset() {
+	*x = RegisterDeviceTokenResponse{}
+	mi := &file_account_v1_account_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegisterDeviceTokenResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterDeviceTokenResponse) ProtoMessage() {}
+
+func (x *RegisterDeviceTokenResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterDeviceTokenResponse.ProtoReflect.Descriptor instead.
+func (*RegisterDeviceTokenResponse) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *RegisterDeviceTokenResponse) GetOwner() *AccountDeviceTokens {
+	if x != nil {
+		return x.Owner
+	}
+	return nil
+}
+
+func (x *RegisterDeviceTokenResponse) GetRevoked() []*AccountDeviceTokens {
+	if x != nil {
+		return x.Revoked
+	}
+	return nil
+}
+
+type RemoveDeviceTokenRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AccountId     string                 `protobuf:"bytes,1,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"` // required
+	AppId         string                 `protobuf:"bytes,2,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`             // required
+	Token         string                 `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`                          // optional — empty removes EVERY token of the account in app_id
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RemoveDeviceTokenRequest) Reset() {
+	*x = RemoveDeviceTokenRequest{}
+	mi := &file_account_v1_account_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemoveDeviceTokenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemoveDeviceTokenRequest) ProtoMessage() {}
+
+func (x *RemoveDeviceTokenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemoveDeviceTokenRequest.ProtoReflect.Descriptor instead.
+func (*RemoveDeviceTokenRequest) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *RemoveDeviceTokenRequest) GetAccountId() string {
+	if x != nil {
+		return x.AccountId
+	}
+	return ""
+}
+
+func (x *RemoveDeviceTokenRequest) GetAppId() string {
+	if x != nil {
+		return x.AppId
+	}
+	return ""
+}
+
+func (x *RemoveDeviceTokenRequest) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+type RemoveDeviceTokenResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Owner         *AccountDeviceTokens   `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RemoveDeviceTokenResponse) Reset() {
+	*x = RemoveDeviceTokenResponse{}
+	mi := &file_account_v1_account_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemoveDeviceTokenResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemoveDeviceTokenResponse) ProtoMessage() {}
+
+func (x *RemoveDeviceTokenResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemoveDeviceTokenResponse.ProtoReflect.Descriptor instead.
+func (*RemoveDeviceTokenResponse) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *RemoveDeviceTokenResponse) GetOwner() *AccountDeviceTokens {
+	if x != nil {
+		return x.Owner
+	}
+	return nil
+}
+
+type ListDeviceTokensRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AccountId     string                 `protobuf:"bytes,1,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
+	AppId         string                 `protobuf:"bytes,2,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"` // optional — empty means every app
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListDeviceTokensRequest) Reset() {
+	*x = ListDeviceTokensRequest{}
+	mi := &file_account_v1_account_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListDeviceTokensRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListDeviceTokensRequest) ProtoMessage() {}
+
+func (x *ListDeviceTokensRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListDeviceTokensRequest.ProtoReflect.Descriptor instead.
+func (*ListDeviceTokensRequest) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *ListDeviceTokensRequest) GetAccountId() string {
+	if x != nil {
+		return x.AccountId
+	}
+	return ""
+}
+
+func (x *ListDeviceTokensRequest) GetAppId() string {
+	if x != nil {
+		return x.AppId
+	}
+	return ""
+}
+
+type ListDeviceTokensResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeviceTokens  []*DeviceToken         `protobuf:"bytes,1,rep,name=device_tokens,json=deviceTokens,proto3" json:"device_tokens,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListDeviceTokensResponse) Reset() {
+	*x = ListDeviceTokensResponse{}
+	mi := &file_account_v1_account_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListDeviceTokensResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListDeviceTokensResponse) ProtoMessage() {}
+
+func (x *ListDeviceTokensResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListDeviceTokensResponse.ProtoReflect.Descriptor instead.
+func (*ListDeviceTokensResponse) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *ListDeviceTokensResponse) GetDeviceTokens() []*DeviceToken {
+	if x != nil {
+		return x.DeviceTokens
+	}
+	return nil
+}
+
 type GetAccountByOdooUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	OdooDb        string                 `protobuf:"bytes,1,opt,name=odoo_db,json=odooDb,proto3" json:"odoo_db,omitempty"`
@@ -855,7 +1368,7 @@ type GetAccountByOdooUserRequest struct {
 
 func (x *GetAccountByOdooUserRequest) Reset() {
 	*x = GetAccountByOdooUserRequest{}
-	mi := &file_account_v1_account_proto_msgTypes[11]
+	mi := &file_account_v1_account_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -867,7 +1380,7 @@ func (x *GetAccountByOdooUserRequest) String() string {
 func (*GetAccountByOdooUserRequest) ProtoMessage() {}
 
 func (x *GetAccountByOdooUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_account_v1_account_proto_msgTypes[11]
+	mi := &file_account_v1_account_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -880,7 +1393,7 @@ func (x *GetAccountByOdooUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAccountByOdooUserRequest.ProtoReflect.Descriptor instead.
 func (*GetAccountByOdooUserRequest) Descriptor() ([]byte, []int) {
-	return file_account_v1_account_proto_rawDescGZIP(), []int{11}
+	return file_account_v1_account_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *GetAccountByOdooUserRequest) GetOdooDb() string {
@@ -907,7 +1420,7 @@ type GetOdooMappingRequest struct {
 
 func (x *GetOdooMappingRequest) Reset() {
 	*x = GetOdooMappingRequest{}
-	mi := &file_account_v1_account_proto_msgTypes[12]
+	mi := &file_account_v1_account_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -919,7 +1432,7 @@ func (x *GetOdooMappingRequest) String() string {
 func (*GetOdooMappingRequest) ProtoMessage() {}
 
 func (x *GetOdooMappingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_account_v1_account_proto_msgTypes[12]
+	mi := &file_account_v1_account_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -932,7 +1445,7 @@ func (x *GetOdooMappingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetOdooMappingRequest.ProtoReflect.Descriptor instead.
 func (*GetOdooMappingRequest) Descriptor() ([]byte, []int) {
-	return file_account_v1_account_proto_rawDescGZIP(), []int{12}
+	return file_account_v1_account_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *GetOdooMappingRequest) GetAccountId() string {
@@ -961,7 +1474,7 @@ type UpsertOdooMappingRequest struct {
 
 func (x *UpsertOdooMappingRequest) Reset() {
 	*x = UpsertOdooMappingRequest{}
-	mi := &file_account_v1_account_proto_msgTypes[13]
+	mi := &file_account_v1_account_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -973,7 +1486,7 @@ func (x *UpsertOdooMappingRequest) String() string {
 func (*UpsertOdooMappingRequest) ProtoMessage() {}
 
 func (x *UpsertOdooMappingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_account_v1_account_proto_msgTypes[13]
+	mi := &file_account_v1_account_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -986,7 +1499,7 @@ func (x *UpsertOdooMappingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpsertOdooMappingRequest.ProtoReflect.Descriptor instead.
 func (*UpsertOdooMappingRequest) Descriptor() ([]byte, []int) {
-	return file_account_v1_account_proto_rawDescGZIP(), []int{13}
+	return file_account_v1_account_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *UpsertOdooMappingRequest) GetAccountId() string {
@@ -1030,7 +1543,7 @@ type OdooMapping struct {
 
 func (x *OdooMapping) Reset() {
 	*x = OdooMapping{}
-	mi := &file_account_v1_account_proto_msgTypes[14]
+	mi := &file_account_v1_account_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1042,7 +1555,7 @@ func (x *OdooMapping) String() string {
 func (*OdooMapping) ProtoMessage() {}
 
 func (x *OdooMapping) ProtoReflect() protoreflect.Message {
-	mi := &file_account_v1_account_proto_msgTypes[14]
+	mi := &file_account_v1_account_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1055,7 +1568,7 @@ func (x *OdooMapping) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OdooMapping.ProtoReflect.Descriptor instead.
 func (*OdooMapping) Descriptor() ([]byte, []int) {
-	return file_account_v1_account_proto_rawDescGZIP(), []int{14}
+	return file_account_v1_account_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *OdooMapping) GetAccountId() string {
@@ -1168,7 +1681,41 @@ const file_account_v1_account_proto_rawDesc = "" +
 	"\n" +
 	"account_id\x18\x01 \x01(\tR\taccountId\x121\n" +
 	"\x06status\x18\x02 \x01(\x0e2\x19.account.v1.AccountStatusR\x06status\x12\x16\n" +
-	"\x06reason\x18\x03 \x01(\tR\x06reason\"X\n" +
+	"\x06reason\x18\x03 \x01(\tR\x06reason\"\xeb\x01\n" +
+	"\vDeviceToken\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\x12\x15\n" +
+	"\x06app_id\x18\x02 \x01(\tR\x05appId\x126\n" +
+	"\bplatform\x18\x03 \x01(\x0e2\x1a.account.v1.DevicePlatformR\bplatform\x129\n" +
+	"\n" +
+	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12<\n" +
+	"\flast_seen_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"lastSeenAt\"L\n" +
+	"\x13AccountDeviceTokens\x12\x1d\n" +
+	"\n" +
+	"account_id\x18\x01 \x01(\tR\taccountId\x12\x16\n" +
+	"\x06tokens\x18\x02 \x03(\tR\x06tokens\"\xa0\x01\n" +
+	"\x1aRegisterDeviceTokenRequest\x12\x1d\n" +
+	"\n" +
+	"account_id\x18\x01 \x01(\tR\taccountId\x12\x14\n" +
+	"\x05token\x18\x02 \x01(\tR\x05token\x12\x15\n" +
+	"\x06app_id\x18\x03 \x01(\tR\x05appId\x126\n" +
+	"\bplatform\x18\x04 \x01(\x0e2\x1a.account.v1.DevicePlatformR\bplatform\"\x8f\x01\n" +
+	"\x1bRegisterDeviceTokenResponse\x125\n" +
+	"\x05owner\x18\x01 \x01(\v2\x1f.account.v1.AccountDeviceTokensR\x05owner\x129\n" +
+	"\arevoked\x18\x02 \x03(\v2\x1f.account.v1.AccountDeviceTokensR\arevoked\"f\n" +
+	"\x18RemoveDeviceTokenRequest\x12\x1d\n" +
+	"\n" +
+	"account_id\x18\x01 \x01(\tR\taccountId\x12\x15\n" +
+	"\x06app_id\x18\x02 \x01(\tR\x05appId\x12\x14\n" +
+	"\x05token\x18\x03 \x01(\tR\x05token\"R\n" +
+	"\x19RemoveDeviceTokenResponse\x125\n" +
+	"\x05owner\x18\x01 \x01(\v2\x1f.account.v1.AccountDeviceTokensR\x05owner\"O\n" +
+	"\x17ListDeviceTokensRequest\x12\x1d\n" +
+	"\n" +
+	"account_id\x18\x01 \x01(\tR\taccountId\x12\x15\n" +
+	"\x06app_id\x18\x02 \x01(\tR\x05appId\"X\n" +
+	"\x18ListDeviceTokensResponse\x12<\n" +
+	"\rdevice_tokens\x18\x01 \x03(\v2\x17.account.v1.DeviceTokenR\fdeviceTokens\"X\n" +
 	"\x1bGetAccountByOdooUserRequest\x12\x17\n" +
 	"\aodoo_db\x18\x01 \x01(\tR\x06odooDb\x12 \n" +
 	"\fodoo_user_id\x18\x02 \x01(\x05R\n" +
@@ -1198,7 +1745,12 @@ const file_account_v1_account_proto_rawDesc = "" +
 	"\x1aACCOUNT_STATUS_UNSPECIFIED\x10\x00\x12\x19\n" +
 	"\x15ACCOUNT_STATUS_ACTIVE\x10\x01\x12\x1c\n" +
 	"\x18ACCOUNT_STATUS_SUSPENDED\x10\x02\x12\x1e\n" +
-	"\x1aACCOUNT_STATUS_DEACTIVATED\x10\x032\xe2\x03\n" +
+	"\x1aACCOUNT_STATUS_DEACTIVATED\x10\x03*\x80\x01\n" +
+	"\x0eDevicePlatform\x12\x1f\n" +
+	"\x1bDEVICE_PLATFORM_UNSPECIFIED\x10\x00\x12\x17\n" +
+	"\x13DEVICE_PLATFORM_WEB\x10\x01\x12\x1b\n" +
+	"\x17DEVICE_PLATFORM_ANDROID\x10\x02\x12\x17\n" +
+	"\x13DEVICE_PLATFORM_IOS\x10\x032\x8b\x06\n" +
 	"\x0eAccountService\x12@\n" +
 	"\n" +
 	"GetAccount\x12\x1d.account.v1.GetAccountRequest\x1a\x13.account.v1.Account\x12]\n" +
@@ -1206,7 +1758,10 @@ const file_account_v1_account_proto_rawDesc = "" +
 	"\rEnsureAccount\x12 .account.v1.EnsureAccountRequest\x1a\x13.account.v1.Account\x12F\n" +
 	"\rUpdateProfile\x12 .account.v1.UpdateProfileRequest\x1a\x13.account.v1.Account\x12Q\n" +
 	"\fListAccounts\x12\x1f.account.v1.ListAccountsRequest\x1a .account.v1.ListAccountsResponse\x12L\n" +
-	"\x10SetAccountStatus\x12#.account.v1.SetAccountStatusRequest\x1a\x13.account.v1.Account2\x8c\x02\n" +
+	"\x10SetAccountStatus\x12#.account.v1.SetAccountStatusRequest\x1a\x13.account.v1.Account\x12f\n" +
+	"\x13RegisterDeviceToken\x12&.account.v1.RegisterDeviceTokenRequest\x1a'.account.v1.RegisterDeviceTokenResponse\x12`\n" +
+	"\x11RemoveDeviceToken\x12$.account.v1.RemoveDeviceTokenRequest\x1a%.account.v1.RemoveDeviceTokenResponse\x12]\n" +
+	"\x10ListDeviceTokens\x12#.account.v1.ListDeviceTokensRequest\x1a$.account.v1.ListDeviceTokensResponse2\x8c\x02\n" +
 	"\x12OdooMappingService\x12T\n" +
 	"\x14GetAccountByOdooUser\x12'.account.v1.GetAccountByOdooUserRequest\x1a\x13.account.v1.Account\x12L\n" +
 	"\x0eGetOdooMapping\x12!.account.v1.GetOdooMappingRequest\x1a\x17.account.v1.OdooMapping\x12R\n" +
@@ -1224,66 +1779,89 @@ func file_account_v1_account_proto_rawDescGZIP() []byte {
 	return file_account_v1_account_proto_rawDescData
 }
 
-var file_account_v1_account_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_account_v1_account_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_account_v1_account_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_account_v1_account_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_account_v1_account_proto_goTypes = []any{
 	(AccountStatus)(0),                  // 0: account.v1.AccountStatus
-	(*Account)(nil),                     // 1: account.v1.Account
-	(*Profile)(nil),                     // 2: account.v1.Profile
-	(*GetAccountRequest)(nil),           // 3: account.v1.GetAccountRequest
-	(*BatchGetAccountsRequest)(nil),     // 4: account.v1.BatchGetAccountsRequest
-	(*BatchGetAccountsResponse)(nil),    // 5: account.v1.BatchGetAccountsResponse
-	(*EnsureAccountRequest)(nil),        // 6: account.v1.EnsureAccountRequest
-	(*OdooHint)(nil),                    // 7: account.v1.OdooHint
-	(*UpdateProfileRequest)(nil),        // 8: account.v1.UpdateProfileRequest
-	(*ListAccountsRequest)(nil),         // 9: account.v1.ListAccountsRequest
-	(*ListAccountsResponse)(nil),        // 10: account.v1.ListAccountsResponse
-	(*SetAccountStatusRequest)(nil),     // 11: account.v1.SetAccountStatusRequest
-	(*GetAccountByOdooUserRequest)(nil), // 12: account.v1.GetAccountByOdooUserRequest
-	(*GetOdooMappingRequest)(nil),       // 13: account.v1.GetOdooMappingRequest
-	(*UpsertOdooMappingRequest)(nil),    // 14: account.v1.UpsertOdooMappingRequest
-	(*OdooMapping)(nil),                 // 15: account.v1.OdooMapping
-	nil,                                 // 16: account.v1.Profile.AttributesEntry
-	(*timestamppb.Timestamp)(nil),       // 17: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),       // 18: google.protobuf.FieldMask
+	(DevicePlatform)(0),                 // 1: account.v1.DevicePlatform
+	(*Account)(nil),                     // 2: account.v1.Account
+	(*Profile)(nil),                     // 3: account.v1.Profile
+	(*GetAccountRequest)(nil),           // 4: account.v1.GetAccountRequest
+	(*BatchGetAccountsRequest)(nil),     // 5: account.v1.BatchGetAccountsRequest
+	(*BatchGetAccountsResponse)(nil),    // 6: account.v1.BatchGetAccountsResponse
+	(*EnsureAccountRequest)(nil),        // 7: account.v1.EnsureAccountRequest
+	(*OdooHint)(nil),                    // 8: account.v1.OdooHint
+	(*UpdateProfileRequest)(nil),        // 9: account.v1.UpdateProfileRequest
+	(*ListAccountsRequest)(nil),         // 10: account.v1.ListAccountsRequest
+	(*ListAccountsResponse)(nil),        // 11: account.v1.ListAccountsResponse
+	(*SetAccountStatusRequest)(nil),     // 12: account.v1.SetAccountStatusRequest
+	(*DeviceToken)(nil),                 // 13: account.v1.DeviceToken
+	(*AccountDeviceTokens)(nil),         // 14: account.v1.AccountDeviceTokens
+	(*RegisterDeviceTokenRequest)(nil),  // 15: account.v1.RegisterDeviceTokenRequest
+	(*RegisterDeviceTokenResponse)(nil), // 16: account.v1.RegisterDeviceTokenResponse
+	(*RemoveDeviceTokenRequest)(nil),    // 17: account.v1.RemoveDeviceTokenRequest
+	(*RemoveDeviceTokenResponse)(nil),   // 18: account.v1.RemoveDeviceTokenResponse
+	(*ListDeviceTokensRequest)(nil),     // 19: account.v1.ListDeviceTokensRequest
+	(*ListDeviceTokensResponse)(nil),    // 20: account.v1.ListDeviceTokensResponse
+	(*GetAccountByOdooUserRequest)(nil), // 21: account.v1.GetAccountByOdooUserRequest
+	(*GetOdooMappingRequest)(nil),       // 22: account.v1.GetOdooMappingRequest
+	(*UpsertOdooMappingRequest)(nil),    // 23: account.v1.UpsertOdooMappingRequest
+	(*OdooMapping)(nil),                 // 24: account.v1.OdooMapping
+	nil,                                 // 25: account.v1.Profile.AttributesEntry
+	(*timestamppb.Timestamp)(nil),       // 26: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),       // 27: google.protobuf.FieldMask
 }
 var file_account_v1_account_proto_depIdxs = []int32{
 	0,  // 0: account.v1.Account.status:type_name -> account.v1.AccountStatus
-	2,  // 1: account.v1.Account.profile:type_name -> account.v1.Profile
-	17, // 2: account.v1.Account.created_at:type_name -> google.protobuf.Timestamp
-	17, // 3: account.v1.Account.updated_at:type_name -> google.protobuf.Timestamp
-	16, // 4: account.v1.Profile.attributes:type_name -> account.v1.Profile.AttributesEntry
-	1,  // 5: account.v1.BatchGetAccountsResponse.accounts:type_name -> account.v1.Account
-	7,  // 6: account.v1.EnsureAccountRequest.odoo_hint:type_name -> account.v1.OdooHint
-	2,  // 7: account.v1.UpdateProfileRequest.profile:type_name -> account.v1.Profile
-	18, // 8: account.v1.UpdateProfileRequest.update_mask:type_name -> google.protobuf.FieldMask
+	3,  // 1: account.v1.Account.profile:type_name -> account.v1.Profile
+	26, // 2: account.v1.Account.created_at:type_name -> google.protobuf.Timestamp
+	26, // 3: account.v1.Account.updated_at:type_name -> google.protobuf.Timestamp
+	25, // 4: account.v1.Profile.attributes:type_name -> account.v1.Profile.AttributesEntry
+	2,  // 5: account.v1.BatchGetAccountsResponse.accounts:type_name -> account.v1.Account
+	8,  // 6: account.v1.EnsureAccountRequest.odoo_hint:type_name -> account.v1.OdooHint
+	3,  // 7: account.v1.UpdateProfileRequest.profile:type_name -> account.v1.Profile
+	27, // 8: account.v1.UpdateProfileRequest.update_mask:type_name -> google.protobuf.FieldMask
 	0,  // 9: account.v1.ListAccountsRequest.status:type_name -> account.v1.AccountStatus
-	1,  // 10: account.v1.ListAccountsResponse.accounts:type_name -> account.v1.Account
+	2,  // 10: account.v1.ListAccountsResponse.accounts:type_name -> account.v1.Account
 	0,  // 11: account.v1.SetAccountStatusRequest.status:type_name -> account.v1.AccountStatus
-	17, // 12: account.v1.OdooMapping.synced_at:type_name -> google.protobuf.Timestamp
-	3,  // 13: account.v1.AccountService.GetAccount:input_type -> account.v1.GetAccountRequest
-	4,  // 14: account.v1.AccountService.BatchGetAccounts:input_type -> account.v1.BatchGetAccountsRequest
-	6,  // 15: account.v1.AccountService.EnsureAccount:input_type -> account.v1.EnsureAccountRequest
-	8,  // 16: account.v1.AccountService.UpdateProfile:input_type -> account.v1.UpdateProfileRequest
-	9,  // 17: account.v1.AccountService.ListAccounts:input_type -> account.v1.ListAccountsRequest
-	11, // 18: account.v1.AccountService.SetAccountStatus:input_type -> account.v1.SetAccountStatusRequest
-	12, // 19: account.v1.OdooMappingService.GetAccountByOdooUser:input_type -> account.v1.GetAccountByOdooUserRequest
-	13, // 20: account.v1.OdooMappingService.GetOdooMapping:input_type -> account.v1.GetOdooMappingRequest
-	14, // 21: account.v1.OdooMappingService.UpsertOdooMapping:input_type -> account.v1.UpsertOdooMappingRequest
-	1,  // 22: account.v1.AccountService.GetAccount:output_type -> account.v1.Account
-	5,  // 23: account.v1.AccountService.BatchGetAccounts:output_type -> account.v1.BatchGetAccountsResponse
-	1,  // 24: account.v1.AccountService.EnsureAccount:output_type -> account.v1.Account
-	1,  // 25: account.v1.AccountService.UpdateProfile:output_type -> account.v1.Account
-	10, // 26: account.v1.AccountService.ListAccounts:output_type -> account.v1.ListAccountsResponse
-	1,  // 27: account.v1.AccountService.SetAccountStatus:output_type -> account.v1.Account
-	1,  // 28: account.v1.OdooMappingService.GetAccountByOdooUser:output_type -> account.v1.Account
-	15, // 29: account.v1.OdooMappingService.GetOdooMapping:output_type -> account.v1.OdooMapping
-	15, // 30: account.v1.OdooMappingService.UpsertOdooMapping:output_type -> account.v1.OdooMapping
-	22, // [22:31] is the sub-list for method output_type
-	13, // [13:22] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	1,  // 12: account.v1.DeviceToken.platform:type_name -> account.v1.DevicePlatform
+	26, // 13: account.v1.DeviceToken.created_at:type_name -> google.protobuf.Timestamp
+	26, // 14: account.v1.DeviceToken.last_seen_at:type_name -> google.protobuf.Timestamp
+	1,  // 15: account.v1.RegisterDeviceTokenRequest.platform:type_name -> account.v1.DevicePlatform
+	14, // 16: account.v1.RegisterDeviceTokenResponse.owner:type_name -> account.v1.AccountDeviceTokens
+	14, // 17: account.v1.RegisterDeviceTokenResponse.revoked:type_name -> account.v1.AccountDeviceTokens
+	14, // 18: account.v1.RemoveDeviceTokenResponse.owner:type_name -> account.v1.AccountDeviceTokens
+	13, // 19: account.v1.ListDeviceTokensResponse.device_tokens:type_name -> account.v1.DeviceToken
+	26, // 20: account.v1.OdooMapping.synced_at:type_name -> google.protobuf.Timestamp
+	4,  // 21: account.v1.AccountService.GetAccount:input_type -> account.v1.GetAccountRequest
+	5,  // 22: account.v1.AccountService.BatchGetAccounts:input_type -> account.v1.BatchGetAccountsRequest
+	7,  // 23: account.v1.AccountService.EnsureAccount:input_type -> account.v1.EnsureAccountRequest
+	9,  // 24: account.v1.AccountService.UpdateProfile:input_type -> account.v1.UpdateProfileRequest
+	10, // 25: account.v1.AccountService.ListAccounts:input_type -> account.v1.ListAccountsRequest
+	12, // 26: account.v1.AccountService.SetAccountStatus:input_type -> account.v1.SetAccountStatusRequest
+	15, // 27: account.v1.AccountService.RegisterDeviceToken:input_type -> account.v1.RegisterDeviceTokenRequest
+	17, // 28: account.v1.AccountService.RemoveDeviceToken:input_type -> account.v1.RemoveDeviceTokenRequest
+	19, // 29: account.v1.AccountService.ListDeviceTokens:input_type -> account.v1.ListDeviceTokensRequest
+	21, // 30: account.v1.OdooMappingService.GetAccountByOdooUser:input_type -> account.v1.GetAccountByOdooUserRequest
+	22, // 31: account.v1.OdooMappingService.GetOdooMapping:input_type -> account.v1.GetOdooMappingRequest
+	23, // 32: account.v1.OdooMappingService.UpsertOdooMapping:input_type -> account.v1.UpsertOdooMappingRequest
+	2,  // 33: account.v1.AccountService.GetAccount:output_type -> account.v1.Account
+	6,  // 34: account.v1.AccountService.BatchGetAccounts:output_type -> account.v1.BatchGetAccountsResponse
+	2,  // 35: account.v1.AccountService.EnsureAccount:output_type -> account.v1.Account
+	2,  // 36: account.v1.AccountService.UpdateProfile:output_type -> account.v1.Account
+	11, // 37: account.v1.AccountService.ListAccounts:output_type -> account.v1.ListAccountsResponse
+	2,  // 38: account.v1.AccountService.SetAccountStatus:output_type -> account.v1.Account
+	16, // 39: account.v1.AccountService.RegisterDeviceToken:output_type -> account.v1.RegisterDeviceTokenResponse
+	18, // 40: account.v1.AccountService.RemoveDeviceToken:output_type -> account.v1.RemoveDeviceTokenResponse
+	20, // 41: account.v1.AccountService.ListDeviceTokens:output_type -> account.v1.ListDeviceTokensResponse
+	2,  // 42: account.v1.OdooMappingService.GetAccountByOdooUser:output_type -> account.v1.Account
+	24, // 43: account.v1.OdooMappingService.GetOdooMapping:output_type -> account.v1.OdooMapping
+	24, // 44: account.v1.OdooMappingService.UpsertOdooMapping:output_type -> account.v1.OdooMapping
+	33, // [33:45] is the sub-list for method output_type
+	21, // [21:33] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_account_v1_account_proto_init() }
@@ -1302,8 +1880,8 @@ func file_account_v1_account_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_account_v1_account_proto_rawDesc), len(file_account_v1_account_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   16,
+			NumEnums:      2,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

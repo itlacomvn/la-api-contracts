@@ -27,6 +27,17 @@ service AccountService {
 
   // Change business status; the service syncs enabled/disabled to Keycloak.
   rpc SetAccountStatus(SetAccountStatusRequest) returns (Account);
+
+  // Register a push device token for an account. "Steal-on-register" semantics:
+  // a token that currently belongs to another account is REMOVED from it and
+  // moved to account_id. Idempotent — safe to call on every page load.
+  rpc RegisterDeviceToken(RegisterDeviceTokenRequest) returns (RegisterDeviceTokenResponse);
+
+  // Remove one token, or every token of an account within an app_id. Called on
+  // logout, and when FCM/APNs reports the token as unregistered.
+  rpc RemoveDeviceToken(RemoveDeviceTokenRequest) returns (RemoveDeviceTokenResponse);
+
+  rpc ListDeviceTokens(ListDeviceTokensRequest) returns (ListDeviceTokensResponse);
 }
 
 // OdooMappingService is deliberately separate so it can be removed cleanly once
@@ -115,6 +126,67 @@ message SetAccountStatusRequest {
   string account_id = 1;
   AccountStatus status = 2;
   string reason = 3;
+}
+
+// DeviceToken is one push registration token bound to one account. The token
+// identifies a browser/device, not a user — the same browser hands the same
+// token to whoever logs in next — so (app_id, token) is globally unique and a
+// token can belong to only one account at a time.
+message DeviceToken {
+  string token = 1;
+  string app_id = 2;
+  DevicePlatform platform = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp last_seen_at = 5;
+}
+
+enum DevicePlatform {
+  DEVICE_PLATFORM_UNSPECIFIED = 0;
+  DEVICE_PLATFORM_WEB = 1;
+  DEVICE_PLATFORM_ANDROID = 2;
+  DEVICE_PLATFORM_IOS = 3;
+}
+
+// AccountDeviceTokens is the COMPLETE token set of one account after a mutation
+// completes — a snapshot, not a delta — scoped to the app_id of the request.
+// Callers full-replace their downstream state from it (e.g. Novu
+// PUT /v1/subscribers/{id}/credentials overwrites the whole deviceTokens array).
+message AccountDeviceTokens {
+  string account_id = 1;
+  repeated string tokens = 2;
+}
+
+message RegisterDeviceTokenRequest {
+  string account_id = 1; // required
+  string token = 2; // required — FCM/APNs registration token
+  string app_id = 3; // required — per-application namespace, e.g. "esign-hub"
+  DevicePlatform platform = 4; // optional; unspecified never overwrites a known platform
+}
+message RegisterDeviceTokenResponse {
+  AccountDeviceTokens owner = 1; // the registering account and its full token set
+  // Accounts the token was taken away from, each with its REMAINING tokens.
+  // The (app_id, token) uniqueness invariant means there is at most one prior
+  // owner, so this holds 0 or 1 entry — repeated only for forward compatibility.
+  // An account left with zero tokens is still returned, with an empty list:
+  // that entry is what tells the caller to clear the old subscriber.
+  repeated AccountDeviceTokens revoked = 2;
+}
+
+message RemoveDeviceTokenRequest {
+  string account_id = 1; // required
+  string app_id = 2; // required
+  string token = 3; // optional — empty removes EVERY token of the account in app_id
+}
+message RemoveDeviceTokenResponse {
+  AccountDeviceTokens owner = 1;
+}
+
+message ListDeviceTokensRequest {
+  string account_id = 1;
+  string app_id = 2; // optional — empty means every app
+}
+message ListDeviceTokensResponse {
+  repeated DeviceToken device_tokens = 1;
 }
 
 message GetAccountByOdooUserRequest {
