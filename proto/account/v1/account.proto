@@ -116,6 +116,16 @@ message ListAccountsRequest {
   string page_token = 2;
   AccountStatus status = 3; // optional filter
   string query = 4;         // search by email/username/full_name
+  // Restrict the listing to these account ids; empty means "no restriction".
+  // Max 1000 — more returns INVALID_ARGUMENT, as does any unparseable uuid.
+  // Ids that match no account are silently skipped, so the page may be shorter
+  // than page_size without meaning "last page" — trust next_page_token instead.
+  //
+  // Composes with status and query via AND: passing ids together with query
+  // searches WITHIN the id set. Ordering and paging are unchanged, so callers
+  // that resolve an id set locally (e.g. org members) still get one consistent
+  // page sequence over exactly that set.
+  repeated string ids = 5;
 }
 message ListAccountsResponse {
   repeated Account accounts = 1;
