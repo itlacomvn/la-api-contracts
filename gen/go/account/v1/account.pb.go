@@ -1623,6 +1623,208 @@ func (x *OdooMapping) GetSyncedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+type ChangePasswordRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	NewPassword   string                 `protobuf:"bytes,1,opt,name=new_password,json=newPassword,proto3" json:"new_password,omitempty"` // required; strength is enforced by the realm's password policy
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChangePasswordRequest) Reset() {
+	*x = ChangePasswordRequest{}
+	mi := &file_account_v1_account_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChangePasswordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChangePasswordRequest) ProtoMessage() {}
+
+func (x *ChangePasswordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChangePasswordRequest.ProtoReflect.Descriptor instead.
+func (*ChangePasswordRequest) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *ChangePasswordRequest) GetNewPassword() string {
+	if x != nil {
+		return x.NewPassword
+	}
+	return ""
+}
+
+type ChangePasswordResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// false means the password WAS changed but revoking the sessions failed —
+	// tell the user to sign out their other devices manually.
+	SessionsRevoked bool `protobuf:"varint,1,opt,name=sessions_revoked,json=sessionsRevoked,proto3" json:"sessions_revoked,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *ChangePasswordResponse) Reset() {
+	*x = ChangePasswordResponse{}
+	mi := &file_account_v1_account_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChangePasswordResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChangePasswordResponse) ProtoMessage() {}
+
+func (x *ChangePasswordResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChangePasswordResponse.ProtoReflect.Descriptor instead.
+func (*ChangePasswordResponse) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *ChangePasswordResponse) GetSessionsRevoked() bool {
+	if x != nil {
+		return x.SessionsRevoked
+	}
+	return false
+}
+
+type AdminResetPasswordRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AccountId     string                 `protobuf:"bytes,1,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`       // required
+	NewPassword   string                 `protobuf:"bytes,2,opt,name=new_password,json=newPassword,proto3" json:"new_password,omitempty"` // required
+	Temporary     bool                   `protobuf:"varint,3,opt,name=temporary,proto3" json:"temporary,omitempty"`                       // true = Keycloak forces the user to change it at next login
+	Reason        string                 `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`                              // optional, recorded in the audit log
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminResetPasswordRequest) Reset() {
+	*x = AdminResetPasswordRequest{}
+	mi := &file_account_v1_account_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminResetPasswordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminResetPasswordRequest) ProtoMessage() {}
+
+func (x *AdminResetPasswordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminResetPasswordRequest.ProtoReflect.Descriptor instead.
+func (*AdminResetPasswordRequest) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *AdminResetPasswordRequest) GetAccountId() string {
+	if x != nil {
+		return x.AccountId
+	}
+	return ""
+}
+
+func (x *AdminResetPasswordRequest) GetNewPassword() string {
+	if x != nil {
+		return x.NewPassword
+	}
+	return ""
+}
+
+func (x *AdminResetPasswordRequest) GetTemporary() bool {
+	if x != nil {
+		return x.Temporary
+	}
+	return false
+}
+
+func (x *AdminResetPasswordRequest) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+type AdminResetPasswordResponse struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	SessionsRevoked bool                   `protobuf:"varint,1,opt,name=sessions_revoked,json=sessionsRevoked,proto3" json:"sessions_revoked,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *AdminResetPasswordResponse) Reset() {
+	*x = AdminResetPasswordResponse{}
+	mi := &file_account_v1_account_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminResetPasswordResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminResetPasswordResponse) ProtoMessage() {}
+
+func (x *AdminResetPasswordResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminResetPasswordResponse.ProtoReflect.Descriptor instead.
+func (*AdminResetPasswordResponse) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *AdminResetPasswordResponse) GetSessionsRevoked() bool {
+	if x != nil {
+		return x.SessionsRevoked
+	}
+	return false
+}
+
 var File_account_v1_account_proto protoreflect.FileDescriptor
 
 const file_account_v1_account_proto_rawDesc = "" +
@@ -1758,7 +1960,19 @@ const file_account_v1_account_proto_rawDesc = "" +
 	"odooUserId\x12\x1d\n" +
 	"\n" +
 	"odoo_login\x18\x04 \x01(\tR\todooLogin\x127\n" +
-	"\tsynced_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\bsyncedAt*\x88\x01\n" +
+	"\tsynced_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\bsyncedAt\":\n" +
+	"\x15ChangePasswordRequest\x12!\n" +
+	"\fnew_password\x18\x01 \x01(\tR\vnewPassword\"C\n" +
+	"\x16ChangePasswordResponse\x12)\n" +
+	"\x10sessions_revoked\x18\x01 \x01(\bR\x0fsessionsRevoked\"\x93\x01\n" +
+	"\x19AdminResetPasswordRequest\x12\x1d\n" +
+	"\n" +
+	"account_id\x18\x01 \x01(\tR\taccountId\x12!\n" +
+	"\fnew_password\x18\x02 \x01(\tR\vnewPassword\x12\x1c\n" +
+	"\ttemporary\x18\x03 \x01(\bR\ttemporary\x12\x16\n" +
+	"\x06reason\x18\x04 \x01(\tR\x06reason\"G\n" +
+	"\x1aAdminResetPasswordResponse\x12)\n" +
+	"\x10sessions_revoked\x18\x01 \x01(\bR\x0fsessionsRevoked*\x88\x01\n" +
 	"\rAccountStatus\x12\x1e\n" +
 	"\x1aACCOUNT_STATUS_UNSPECIFIED\x10\x00\x12\x19\n" +
 	"\x15ACCOUNT_STATUS_ACTIVE\x10\x01\x12\x1c\n" +
@@ -1768,7 +1982,7 @@ const file_account_v1_account_proto_rawDesc = "" +
 	"\x1bDEVICE_PLATFORM_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13DEVICE_PLATFORM_WEB\x10\x01\x12\x1b\n" +
 	"\x17DEVICE_PLATFORM_ANDROID\x10\x02\x12\x17\n" +
-	"\x13DEVICE_PLATFORM_IOS\x10\x032\x8b\x06\n" +
+	"\x13DEVICE_PLATFORM_IOS\x10\x032\xc9\a\n" +
 	"\x0eAccountService\x12@\n" +
 	"\n" +
 	"GetAccount\x12\x1d.account.v1.GetAccountRequest\x1a\x13.account.v1.Account\x12]\n" +
@@ -1779,7 +1993,9 @@ const file_account_v1_account_proto_rawDesc = "" +
 	"\x10SetAccountStatus\x12#.account.v1.SetAccountStatusRequest\x1a\x13.account.v1.Account\x12f\n" +
 	"\x13RegisterDeviceToken\x12&.account.v1.RegisterDeviceTokenRequest\x1a'.account.v1.RegisterDeviceTokenResponse\x12`\n" +
 	"\x11RemoveDeviceToken\x12$.account.v1.RemoveDeviceTokenRequest\x1a%.account.v1.RemoveDeviceTokenResponse\x12]\n" +
-	"\x10ListDeviceTokens\x12#.account.v1.ListDeviceTokensRequest\x1a$.account.v1.ListDeviceTokensResponse2\x8c\x02\n" +
+	"\x10ListDeviceTokens\x12#.account.v1.ListDeviceTokensRequest\x1a$.account.v1.ListDeviceTokensResponse\x12W\n" +
+	"\x0eChangePassword\x12!.account.v1.ChangePasswordRequest\x1a\".account.v1.ChangePasswordResponse\x12c\n" +
+	"\x12AdminResetPassword\x12%.account.v1.AdminResetPasswordRequest\x1a&.account.v1.AdminResetPasswordResponse2\x8c\x02\n" +
 	"\x12OdooMappingService\x12T\n" +
 	"\x14GetAccountByOdooUser\x12'.account.v1.GetAccountByOdooUserRequest\x1a\x13.account.v1.Account\x12L\n" +
 	"\x0eGetOdooMapping\x12!.account.v1.GetOdooMappingRequest\x1a\x17.account.v1.OdooMapping\x12R\n" +
@@ -1798,7 +2014,7 @@ func file_account_v1_account_proto_rawDescGZIP() []byte {
 }
 
 var file_account_v1_account_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_account_v1_account_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_account_v1_account_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
 var file_account_v1_account_proto_goTypes = []any{
 	(AccountStatus)(0),                  // 0: account.v1.AccountStatus
 	(DevicePlatform)(0),                 // 1: account.v1.DevicePlatform
@@ -1825,32 +2041,36 @@ var file_account_v1_account_proto_goTypes = []any{
 	(*GetOdooMappingRequest)(nil),       // 22: account.v1.GetOdooMappingRequest
 	(*UpsertOdooMappingRequest)(nil),    // 23: account.v1.UpsertOdooMappingRequest
 	(*OdooMapping)(nil),                 // 24: account.v1.OdooMapping
-	nil,                                 // 25: account.v1.Profile.AttributesEntry
-	(*timestamppb.Timestamp)(nil),       // 26: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),       // 27: google.protobuf.FieldMask
+	(*ChangePasswordRequest)(nil),       // 25: account.v1.ChangePasswordRequest
+	(*ChangePasswordResponse)(nil),      // 26: account.v1.ChangePasswordResponse
+	(*AdminResetPasswordRequest)(nil),   // 27: account.v1.AdminResetPasswordRequest
+	(*AdminResetPasswordResponse)(nil),  // 28: account.v1.AdminResetPasswordResponse
+	nil,                                 // 29: account.v1.Profile.AttributesEntry
+	(*timestamppb.Timestamp)(nil),       // 30: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),       // 31: google.protobuf.FieldMask
 }
 var file_account_v1_account_proto_depIdxs = []int32{
 	0,  // 0: account.v1.Account.status:type_name -> account.v1.AccountStatus
 	3,  // 1: account.v1.Account.profile:type_name -> account.v1.Profile
-	26, // 2: account.v1.Account.created_at:type_name -> google.protobuf.Timestamp
-	26, // 3: account.v1.Account.updated_at:type_name -> google.protobuf.Timestamp
-	25, // 4: account.v1.Profile.attributes:type_name -> account.v1.Profile.AttributesEntry
+	30, // 2: account.v1.Account.created_at:type_name -> google.protobuf.Timestamp
+	30, // 3: account.v1.Account.updated_at:type_name -> google.protobuf.Timestamp
+	29, // 4: account.v1.Profile.attributes:type_name -> account.v1.Profile.AttributesEntry
 	2,  // 5: account.v1.BatchGetAccountsResponse.accounts:type_name -> account.v1.Account
 	8,  // 6: account.v1.EnsureAccountRequest.odoo_hint:type_name -> account.v1.OdooHint
 	3,  // 7: account.v1.UpdateProfileRequest.profile:type_name -> account.v1.Profile
-	27, // 8: account.v1.UpdateProfileRequest.update_mask:type_name -> google.protobuf.FieldMask
+	31, // 8: account.v1.UpdateProfileRequest.update_mask:type_name -> google.protobuf.FieldMask
 	0,  // 9: account.v1.ListAccountsRequest.status:type_name -> account.v1.AccountStatus
 	2,  // 10: account.v1.ListAccountsResponse.accounts:type_name -> account.v1.Account
 	0,  // 11: account.v1.SetAccountStatusRequest.status:type_name -> account.v1.AccountStatus
 	1,  // 12: account.v1.DeviceToken.platform:type_name -> account.v1.DevicePlatform
-	26, // 13: account.v1.DeviceToken.created_at:type_name -> google.protobuf.Timestamp
-	26, // 14: account.v1.DeviceToken.last_seen_at:type_name -> google.protobuf.Timestamp
+	30, // 13: account.v1.DeviceToken.created_at:type_name -> google.protobuf.Timestamp
+	30, // 14: account.v1.DeviceToken.last_seen_at:type_name -> google.protobuf.Timestamp
 	1,  // 15: account.v1.RegisterDeviceTokenRequest.platform:type_name -> account.v1.DevicePlatform
 	14, // 16: account.v1.RegisterDeviceTokenResponse.owner:type_name -> account.v1.AccountDeviceTokens
 	14, // 17: account.v1.RegisterDeviceTokenResponse.revoked:type_name -> account.v1.AccountDeviceTokens
 	14, // 18: account.v1.RemoveDeviceTokenResponse.owner:type_name -> account.v1.AccountDeviceTokens
 	13, // 19: account.v1.ListDeviceTokensResponse.device_tokens:type_name -> account.v1.DeviceToken
-	26, // 20: account.v1.OdooMapping.synced_at:type_name -> google.protobuf.Timestamp
+	30, // 20: account.v1.OdooMapping.synced_at:type_name -> google.protobuf.Timestamp
 	4,  // 21: account.v1.AccountService.GetAccount:input_type -> account.v1.GetAccountRequest
 	5,  // 22: account.v1.AccountService.BatchGetAccounts:input_type -> account.v1.BatchGetAccountsRequest
 	7,  // 23: account.v1.AccountService.EnsureAccount:input_type -> account.v1.EnsureAccountRequest
@@ -1860,23 +2080,27 @@ var file_account_v1_account_proto_depIdxs = []int32{
 	15, // 27: account.v1.AccountService.RegisterDeviceToken:input_type -> account.v1.RegisterDeviceTokenRequest
 	17, // 28: account.v1.AccountService.RemoveDeviceToken:input_type -> account.v1.RemoveDeviceTokenRequest
 	19, // 29: account.v1.AccountService.ListDeviceTokens:input_type -> account.v1.ListDeviceTokensRequest
-	21, // 30: account.v1.OdooMappingService.GetAccountByOdooUser:input_type -> account.v1.GetAccountByOdooUserRequest
-	22, // 31: account.v1.OdooMappingService.GetOdooMapping:input_type -> account.v1.GetOdooMappingRequest
-	23, // 32: account.v1.OdooMappingService.UpsertOdooMapping:input_type -> account.v1.UpsertOdooMappingRequest
-	2,  // 33: account.v1.AccountService.GetAccount:output_type -> account.v1.Account
-	6,  // 34: account.v1.AccountService.BatchGetAccounts:output_type -> account.v1.BatchGetAccountsResponse
-	2,  // 35: account.v1.AccountService.EnsureAccount:output_type -> account.v1.Account
-	2,  // 36: account.v1.AccountService.UpdateProfile:output_type -> account.v1.Account
-	11, // 37: account.v1.AccountService.ListAccounts:output_type -> account.v1.ListAccountsResponse
-	2,  // 38: account.v1.AccountService.SetAccountStatus:output_type -> account.v1.Account
-	16, // 39: account.v1.AccountService.RegisterDeviceToken:output_type -> account.v1.RegisterDeviceTokenResponse
-	18, // 40: account.v1.AccountService.RemoveDeviceToken:output_type -> account.v1.RemoveDeviceTokenResponse
-	20, // 41: account.v1.AccountService.ListDeviceTokens:output_type -> account.v1.ListDeviceTokensResponse
-	2,  // 42: account.v1.OdooMappingService.GetAccountByOdooUser:output_type -> account.v1.Account
-	24, // 43: account.v1.OdooMappingService.GetOdooMapping:output_type -> account.v1.OdooMapping
-	24, // 44: account.v1.OdooMappingService.UpsertOdooMapping:output_type -> account.v1.OdooMapping
-	33, // [33:45] is the sub-list for method output_type
-	21, // [21:33] is the sub-list for method input_type
+	25, // 30: account.v1.AccountService.ChangePassword:input_type -> account.v1.ChangePasswordRequest
+	27, // 31: account.v1.AccountService.AdminResetPassword:input_type -> account.v1.AdminResetPasswordRequest
+	21, // 32: account.v1.OdooMappingService.GetAccountByOdooUser:input_type -> account.v1.GetAccountByOdooUserRequest
+	22, // 33: account.v1.OdooMappingService.GetOdooMapping:input_type -> account.v1.GetOdooMappingRequest
+	23, // 34: account.v1.OdooMappingService.UpsertOdooMapping:input_type -> account.v1.UpsertOdooMappingRequest
+	2,  // 35: account.v1.AccountService.GetAccount:output_type -> account.v1.Account
+	6,  // 36: account.v1.AccountService.BatchGetAccounts:output_type -> account.v1.BatchGetAccountsResponse
+	2,  // 37: account.v1.AccountService.EnsureAccount:output_type -> account.v1.Account
+	2,  // 38: account.v1.AccountService.UpdateProfile:output_type -> account.v1.Account
+	11, // 39: account.v1.AccountService.ListAccounts:output_type -> account.v1.ListAccountsResponse
+	2,  // 40: account.v1.AccountService.SetAccountStatus:output_type -> account.v1.Account
+	16, // 41: account.v1.AccountService.RegisterDeviceToken:output_type -> account.v1.RegisterDeviceTokenResponse
+	18, // 42: account.v1.AccountService.RemoveDeviceToken:output_type -> account.v1.RemoveDeviceTokenResponse
+	20, // 43: account.v1.AccountService.ListDeviceTokens:output_type -> account.v1.ListDeviceTokensResponse
+	26, // 44: account.v1.AccountService.ChangePassword:output_type -> account.v1.ChangePasswordResponse
+	28, // 45: account.v1.AccountService.AdminResetPassword:output_type -> account.v1.AdminResetPasswordResponse
+	2,  // 46: account.v1.OdooMappingService.GetAccountByOdooUser:output_type -> account.v1.Account
+	24, // 47: account.v1.OdooMappingService.GetOdooMapping:output_type -> account.v1.OdooMapping
+	24, // 48: account.v1.OdooMappingService.UpsertOdooMapping:output_type -> account.v1.OdooMapping
+	35, // [35:49] is the sub-list for method output_type
+	21, // [21:35] is the sub-list for method input_type
 	21, // [21:21] is the sub-list for extension type_name
 	21, // [21:21] is the sub-list for extension extendee
 	0,  // [0:21] is the sub-list for field type_name
@@ -1899,7 +2123,7 @@ func file_account_v1_account_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_account_v1_account_proto_rawDesc), len(file_account_v1_account_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   24,
+			NumMessages:   28,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

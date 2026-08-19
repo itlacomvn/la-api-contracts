@@ -38,6 +38,16 @@ service AccountService {
   rpc RemoveDeviceToken(RemoveDeviceTokenRequest) returns (RemoveDeviceTokenResponse);
 
   rpc ListDeviceTokens(ListDeviceTokensRequest) returns (ListDeviceTokensResponse);
+
+  // Self-service password change. The target user is the bearer token's SUBJECT
+  // — the request carries no account id on purpose, so there is no shape of this
+  // call that changes somebody else's password. Every session of that user is
+  // revoked on success, which also ends the caller's own session.
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
+
+  // Privileged reset of ANOTHER user's password (helpdesk). Requires the realm
+  // role "account-admin"; set temporary to force a change at next login.
+  rpc AdminResetPassword(AdminResetPasswordRequest) returns (AdminResetPasswordResponse);
 }
 
 // OdooMappingService is deliberately separate so it can be removed cleanly once
@@ -219,4 +229,30 @@ message OdooMapping {
   int32 odoo_user_id = 3;
   string odoo_login = 4;
   google.protobuf.Timestamp synced_at = 5;
+}
+
+// --- password ---
+//
+// Neither request carries the current password: this service does not verify it.
+// A valid bearer token is the whole authorisation, so an access token is as
+// powerful as the password itself until it expires — which is why a successful
+// change revokes every session.
+
+message ChangePasswordRequest {
+  string new_password = 1; // required; strength is enforced by the realm's password policy
+}
+message ChangePasswordResponse {
+  // false means the password WAS changed but revoking the sessions failed —
+  // tell the user to sign out their other devices manually.
+  bool sessions_revoked = 1;
+}
+
+message AdminResetPasswordRequest {
+  string account_id = 1;   // required
+  string new_password = 2; // required
+  bool temporary = 3;      // true = Keycloak forces the user to change it at next login
+  string reason = 4;       // optional, recorded in the audit log
+}
+message AdminResetPasswordResponse {
+  bool sessions_revoked = 1;
 }

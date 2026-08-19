@@ -28,6 +28,8 @@ const (
 	AccountService_RegisterDeviceToken_FullMethodName = "/account.v1.AccountService/RegisterDeviceToken"
 	AccountService_RemoveDeviceToken_FullMethodName   = "/account.v1.AccountService/RemoveDeviceToken"
 	AccountService_ListDeviceTokens_FullMethodName    = "/account.v1.AccountService/ListDeviceTokens"
+	AccountService_ChangePassword_FullMethodName      = "/account.v1.AccountService/ChangePassword"
+	AccountService_AdminResetPassword_FullMethodName  = "/account.v1.AccountService/AdminResetPassword"
 )
 
 // AccountServiceClient is the client API for AccountService service.
@@ -57,6 +59,14 @@ type AccountServiceClient interface {
 	// logout, and when FCM/APNs reports the token as unregistered.
 	RemoveDeviceToken(ctx context.Context, in *RemoveDeviceTokenRequest, opts ...grpc.CallOption) (*RemoveDeviceTokenResponse, error)
 	ListDeviceTokens(ctx context.Context, in *ListDeviceTokensRequest, opts ...grpc.CallOption) (*ListDeviceTokensResponse, error)
+	// Self-service password change. The target user is the bearer token's SUBJECT
+	// — the request carries no account id on purpose, so there is no shape of this
+	// call that changes somebody else's password. Every session of that user is
+	// revoked on success, which also ends the caller's own session.
+	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error)
+	// Privileged reset of ANOTHER user's password (helpdesk). Requires the realm
+	// role "account-admin"; set temporary to force a change at next login.
+	AdminResetPassword(ctx context.Context, in *AdminResetPasswordRequest, opts ...grpc.CallOption) (*AdminResetPasswordResponse, error)
 }
 
 type accountServiceClient struct {
@@ -157,6 +167,26 @@ func (c *accountServiceClient) ListDeviceTokens(ctx context.Context, in *ListDev
 	return out, nil
 }
 
+func (c *accountServiceClient) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ChangePasswordResponse)
+	err := c.cc.Invoke(ctx, AccountService_ChangePassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountServiceClient) AdminResetPassword(ctx context.Context, in *AdminResetPasswordRequest, opts ...grpc.CallOption) (*AdminResetPasswordResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminResetPasswordResponse)
+	err := c.cc.Invoke(ctx, AccountService_AdminResetPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AccountServiceServer is the server API for AccountService service.
 // All implementations must embed UnimplementedAccountServiceServer
 // for forward compatibility.
@@ -184,6 +214,14 @@ type AccountServiceServer interface {
 	// logout, and when FCM/APNs reports the token as unregistered.
 	RemoveDeviceToken(context.Context, *RemoveDeviceTokenRequest) (*RemoveDeviceTokenResponse, error)
 	ListDeviceTokens(context.Context, *ListDeviceTokensRequest) (*ListDeviceTokensResponse, error)
+	// Self-service password change. The target user is the bearer token's SUBJECT
+	// — the request carries no account id on purpose, so there is no shape of this
+	// call that changes somebody else's password. Every session of that user is
+	// revoked on success, which also ends the caller's own session.
+	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error)
+	// Privileged reset of ANOTHER user's password (helpdesk). Requires the realm
+	// role "account-admin"; set temporary to force a change at next login.
+	AdminResetPassword(context.Context, *AdminResetPasswordRequest) (*AdminResetPasswordResponse, error)
 	mustEmbedUnimplementedAccountServiceServer()
 }
 
@@ -220,6 +258,12 @@ func (UnimplementedAccountServiceServer) RemoveDeviceToken(context.Context, *Rem
 }
 func (UnimplementedAccountServiceServer) ListDeviceTokens(context.Context, *ListDeviceTokensRequest) (*ListDeviceTokensResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListDeviceTokens not implemented")
+}
+func (UnimplementedAccountServiceServer) ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ChangePassword not implemented")
+}
+func (UnimplementedAccountServiceServer) AdminResetPassword(context.Context, *AdminResetPasswordRequest) (*AdminResetPasswordResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminResetPassword not implemented")
 }
 func (UnimplementedAccountServiceServer) mustEmbedUnimplementedAccountServiceServer() {}
 func (UnimplementedAccountServiceServer) testEmbeddedByValue()                        {}
@@ -404,6 +448,42 @@ func _AccountService_ListDeviceTokens_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AccountService_ChangePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangePasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccountServiceServer).ChangePassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AccountService_ChangePassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccountServiceServer).ChangePassword(ctx, req.(*ChangePasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AccountService_AdminResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminResetPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccountServiceServer).AdminResetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AccountService_AdminResetPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccountServiceServer).AdminResetPassword(ctx, req.(*AdminResetPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AccountService_ServiceDesc is the grpc.ServiceDesc for AccountService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -446,6 +526,14 @@ var AccountService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListDeviceTokens",
 			Handler:    _AccountService_ListDeviceTokens_Handler,
+		},
+		{
+			MethodName: "ChangePassword",
+			Handler:    _AccountService_ChangePassword_Handler,
+		},
+		{
+			MethodName: "AdminResetPassword",
+			Handler:    _AccountService_AdminResetPassword_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
