@@ -19,17 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AccountService_GetAccount_FullMethodName          = "/account.v1.AccountService/GetAccount"
-	AccountService_BatchGetAccounts_FullMethodName    = "/account.v1.AccountService/BatchGetAccounts"
-	AccountService_EnsureAccount_FullMethodName       = "/account.v1.AccountService/EnsureAccount"
-	AccountService_UpdateProfile_FullMethodName       = "/account.v1.AccountService/UpdateProfile"
-	AccountService_ListAccounts_FullMethodName        = "/account.v1.AccountService/ListAccounts"
-	AccountService_SetAccountStatus_FullMethodName    = "/account.v1.AccountService/SetAccountStatus"
-	AccountService_RegisterDeviceToken_FullMethodName = "/account.v1.AccountService/RegisterDeviceToken"
-	AccountService_RemoveDeviceToken_FullMethodName   = "/account.v1.AccountService/RemoveDeviceToken"
-	AccountService_ListDeviceTokens_FullMethodName    = "/account.v1.AccountService/ListDeviceTokens"
-	AccountService_ChangePassword_FullMethodName      = "/account.v1.AccountService/ChangePassword"
-	AccountService_AdminResetPassword_FullMethodName  = "/account.v1.AccountService/AdminResetPassword"
+	AccountService_GetAccount_FullMethodName         = "/account.v1.AccountService/GetAccount"
+	AccountService_BatchGetAccounts_FullMethodName   = "/account.v1.AccountService/BatchGetAccounts"
+	AccountService_EnsureAccount_FullMethodName      = "/account.v1.AccountService/EnsureAccount"
+	AccountService_UpdateProfile_FullMethodName      = "/account.v1.AccountService/UpdateProfile"
+	AccountService_ListAccounts_FullMethodName       = "/account.v1.AccountService/ListAccounts"
+	AccountService_SetAccountStatus_FullMethodName   = "/account.v1.AccountService/SetAccountStatus"
+	AccountService_ChangePassword_FullMethodName     = "/account.v1.AccountService/ChangePassword"
+	AccountService_AdminResetPassword_FullMethodName = "/account.v1.AccountService/AdminResetPassword"
 )
 
 // AccountServiceClient is the client API for AccountService service.
@@ -51,14 +48,6 @@ type AccountServiceClient interface {
 	ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*ListAccountsResponse, error)
 	// Change business status; the service syncs enabled/disabled to Keycloak.
 	SetAccountStatus(ctx context.Context, in *SetAccountStatusRequest, opts ...grpc.CallOption) (*Account, error)
-	// Register a push device token for an account. "Steal-on-register" semantics:
-	// a token that currently belongs to another account is REMOVED from it and
-	// moved to account_id. Idempotent — safe to call on every page load.
-	RegisterDeviceToken(ctx context.Context, in *RegisterDeviceTokenRequest, opts ...grpc.CallOption) (*RegisterDeviceTokenResponse, error)
-	// Remove one token, or every token of an account within an app_id. Called on
-	// logout, and when FCM/APNs reports the token as unregistered.
-	RemoveDeviceToken(ctx context.Context, in *RemoveDeviceTokenRequest, opts ...grpc.CallOption) (*RemoveDeviceTokenResponse, error)
-	ListDeviceTokens(ctx context.Context, in *ListDeviceTokensRequest, opts ...grpc.CallOption) (*ListDeviceTokensResponse, error)
 	// Self-service password change. The target user is the bearer token's SUBJECT
 	// — the request carries no account id on purpose, so there is no shape of this
 	// call that changes somebody else's password. Every session of that user is
@@ -137,36 +126,6 @@ func (c *accountServiceClient) SetAccountStatus(ctx context.Context, in *SetAcco
 	return out, nil
 }
 
-func (c *accountServiceClient) RegisterDeviceToken(ctx context.Context, in *RegisterDeviceTokenRequest, opts ...grpc.CallOption) (*RegisterDeviceTokenResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RegisterDeviceTokenResponse)
-	err := c.cc.Invoke(ctx, AccountService_RegisterDeviceToken_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *accountServiceClient) RemoveDeviceToken(ctx context.Context, in *RemoveDeviceTokenRequest, opts ...grpc.CallOption) (*RemoveDeviceTokenResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RemoveDeviceTokenResponse)
-	err := c.cc.Invoke(ctx, AccountService_RemoveDeviceToken_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *accountServiceClient) ListDeviceTokens(ctx context.Context, in *ListDeviceTokensRequest, opts ...grpc.CallOption) (*ListDeviceTokensResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListDeviceTokensResponse)
-	err := c.cc.Invoke(ctx, AccountService_ListDeviceTokens_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *accountServiceClient) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ChangePasswordResponse)
@@ -206,14 +165,6 @@ type AccountServiceServer interface {
 	ListAccounts(context.Context, *ListAccountsRequest) (*ListAccountsResponse, error)
 	// Change business status; the service syncs enabled/disabled to Keycloak.
 	SetAccountStatus(context.Context, *SetAccountStatusRequest) (*Account, error)
-	// Register a push device token for an account. "Steal-on-register" semantics:
-	// a token that currently belongs to another account is REMOVED from it and
-	// moved to account_id. Idempotent — safe to call on every page load.
-	RegisterDeviceToken(context.Context, *RegisterDeviceTokenRequest) (*RegisterDeviceTokenResponse, error)
-	// Remove one token, or every token of an account within an app_id. Called on
-	// logout, and when FCM/APNs reports the token as unregistered.
-	RemoveDeviceToken(context.Context, *RemoveDeviceTokenRequest) (*RemoveDeviceTokenResponse, error)
-	ListDeviceTokens(context.Context, *ListDeviceTokensRequest) (*ListDeviceTokensResponse, error)
 	// Self-service password change. The target user is the bearer token's SUBJECT
 	// — the request carries no account id on purpose, so there is no shape of this
 	// call that changes somebody else's password. Every session of that user is
@@ -249,15 +200,6 @@ func (UnimplementedAccountServiceServer) ListAccounts(context.Context, *ListAcco
 }
 func (UnimplementedAccountServiceServer) SetAccountStatus(context.Context, *SetAccountStatusRequest) (*Account, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetAccountStatus not implemented")
-}
-func (UnimplementedAccountServiceServer) RegisterDeviceToken(context.Context, *RegisterDeviceTokenRequest) (*RegisterDeviceTokenResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method RegisterDeviceToken not implemented")
-}
-func (UnimplementedAccountServiceServer) RemoveDeviceToken(context.Context, *RemoveDeviceTokenRequest) (*RemoveDeviceTokenResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method RemoveDeviceToken not implemented")
-}
-func (UnimplementedAccountServiceServer) ListDeviceTokens(context.Context, *ListDeviceTokensRequest) (*ListDeviceTokensResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ListDeviceTokens not implemented")
 }
 func (UnimplementedAccountServiceServer) ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ChangePassword not implemented")
@@ -394,60 +336,6 @@ func _AccountService_SetAccountStatus_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AccountService_RegisterDeviceToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RegisterDeviceTokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AccountServiceServer).RegisterDeviceToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AccountService_RegisterDeviceToken_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccountServiceServer).RegisterDeviceToken(ctx, req.(*RegisterDeviceTokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AccountService_RemoveDeviceToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RemoveDeviceTokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AccountServiceServer).RemoveDeviceToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AccountService_RemoveDeviceToken_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccountServiceServer).RemoveDeviceToken(ctx, req.(*RemoveDeviceTokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AccountService_ListDeviceTokens_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListDeviceTokensRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AccountServiceServer).ListDeviceTokens(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AccountService_ListDeviceTokens_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccountServiceServer).ListDeviceTokens(ctx, req.(*ListDeviceTokensRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _AccountService_ChangePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ChangePasswordRequest)
 	if err := dec(in); err != nil {
@@ -514,18 +402,6 @@ var AccountService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetAccountStatus",
 			Handler:    _AccountService_SetAccountStatus_Handler,
-		},
-		{
-			MethodName: "RegisterDeviceToken",
-			Handler:    _AccountService_RegisterDeviceToken_Handler,
-		},
-		{
-			MethodName: "RemoveDeviceToken",
-			Handler:    _AccountService_RemoveDeviceToken_Handler,
-		},
-		{
-			MethodName: "ListDeviceTokens",
-			Handler:    _AccountService_ListDeviceTokens_Handler,
 		},
 		{
 			MethodName: "ChangePassword",
