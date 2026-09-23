@@ -420,6 +420,7 @@ const (
 	OdooMappingService_GetAccountByOdooUser_FullMethodName = "/account.v1.OdooMappingService/GetAccountByOdooUser"
 	OdooMappingService_GetOdooMapping_FullMethodName       = "/account.v1.OdooMappingService/GetOdooMapping"
 	OdooMappingService_UpsertOdooMapping_FullMethodName    = "/account.v1.OdooMappingService/UpsertOdooMapping"
+	OdooMappingService_BatchGetOdooMappings_FullMethodName = "/account.v1.OdooMappingService/BatchGetOdooMappings"
 )
 
 // OdooMappingServiceClient is the client API for OdooMappingService service.
@@ -432,6 +433,9 @@ type OdooMappingServiceClient interface {
 	GetAccountByOdooUser(ctx context.Context, in *GetAccountByOdooUserRequest, opts ...grpc.CallOption) (*Account, error)
 	GetOdooMapping(ctx context.Context, in *GetOdooMappingRequest, opts ...grpc.CallOption) (*OdooMapping, error)
 	UpsertOdooMapping(ctx context.Context, in *UpsertOdooMappingRequest, opts ...grpc.CallOption) (*OdooMapping, error)
+	// Batch resolve, so a caller hydrating a page of accounts with their Odoo ids
+	// (or the reverse) makes one call instead of one per row.
+	BatchGetOdooMappings(ctx context.Context, in *BatchGetOdooMappingsRequest, opts ...grpc.CallOption) (*BatchGetOdooMappingsResponse, error)
 }
 
 type odooMappingServiceClient struct {
@@ -472,6 +476,16 @@ func (c *odooMappingServiceClient) UpsertOdooMapping(ctx context.Context, in *Up
 	return out, nil
 }
 
+func (c *odooMappingServiceClient) BatchGetOdooMappings(ctx context.Context, in *BatchGetOdooMappingsRequest, opts ...grpc.CallOption) (*BatchGetOdooMappingsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BatchGetOdooMappingsResponse)
+	err := c.cc.Invoke(ctx, OdooMappingService_BatchGetOdooMappings_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OdooMappingServiceServer is the server API for OdooMappingService service.
 // All implementations must embed UnimplementedOdooMappingServiceServer
 // for forward compatibility.
@@ -482,6 +496,9 @@ type OdooMappingServiceServer interface {
 	GetAccountByOdooUser(context.Context, *GetAccountByOdooUserRequest) (*Account, error)
 	GetOdooMapping(context.Context, *GetOdooMappingRequest) (*OdooMapping, error)
 	UpsertOdooMapping(context.Context, *UpsertOdooMappingRequest) (*OdooMapping, error)
+	// Batch resolve, so a caller hydrating a page of accounts with their Odoo ids
+	// (or the reverse) makes one call instead of one per row.
+	BatchGetOdooMappings(context.Context, *BatchGetOdooMappingsRequest) (*BatchGetOdooMappingsResponse, error)
 	mustEmbedUnimplementedOdooMappingServiceServer()
 }
 
@@ -500,6 +517,9 @@ func (UnimplementedOdooMappingServiceServer) GetOdooMapping(context.Context, *Ge
 }
 func (UnimplementedOdooMappingServiceServer) UpsertOdooMapping(context.Context, *UpsertOdooMappingRequest) (*OdooMapping, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpsertOdooMapping not implemented")
+}
+func (UnimplementedOdooMappingServiceServer) BatchGetOdooMappings(context.Context, *BatchGetOdooMappingsRequest) (*BatchGetOdooMappingsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method BatchGetOdooMappings not implemented")
 }
 func (UnimplementedOdooMappingServiceServer) mustEmbedUnimplementedOdooMappingServiceServer() {}
 func (UnimplementedOdooMappingServiceServer) testEmbeddedByValue()                            {}
@@ -576,6 +596,24 @@ func _OdooMappingService_UpsertOdooMapping_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OdooMappingService_BatchGetOdooMappings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchGetOdooMappingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OdooMappingServiceServer).BatchGetOdooMappings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OdooMappingService_BatchGetOdooMappings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OdooMappingServiceServer).BatchGetOdooMappings(ctx, req.(*BatchGetOdooMappingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OdooMappingService_ServiceDesc is the grpc.ServiceDesc for OdooMappingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -594,6 +632,10 @@ var OdooMappingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpsertOdooMapping",
 			Handler:    _OdooMappingService_UpsertOdooMapping_Handler,
+		},
+		{
+			MethodName: "BatchGetOdooMappings",
+			Handler:    _OdooMappingService_BatchGetOdooMappings_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

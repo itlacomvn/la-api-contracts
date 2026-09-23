@@ -45,6 +45,10 @@ service OdooMappingService {
   rpc GetAccountByOdooUser(GetAccountByOdooUserRequest) returns (Account);
   rpc GetOdooMapping(GetOdooMappingRequest) returns (OdooMapping);
   rpc UpsertOdooMapping(UpsertOdooMappingRequest) returns (OdooMapping);
+
+  // Batch resolve, so a caller hydrating a page of accounts with their Odoo ids
+  // (or the reverse) makes one call instead of one per row.
+  rpc BatchGetOdooMappings(BatchGetOdooMappingsRequest) returns (BatchGetOdooMappingsResponse);
 }
 
 message Account {
@@ -125,10 +129,25 @@ message ListAccountsRequest {
   // that resolve an id set locally (e.g. org members) still get one consistent
   // page sequence over exactly that set.
   repeated string ids = 5;
+
+  // Offset pagination, for callers that must render numbered pages and a total
+  // (the keyset cursor above can express neither). Its PRESENCE selects the
+  // mode — page 1 is offset 0, which is why this is `optional` rather than a
+  // plain int32 that could not tell "first page" from "not set".
+  //
+  // Sending both offset and page_token is INVALID_ARGUMENT: they are two
+  // different cursors over the same ordering and honouring one would silently
+  // ignore the other. In offset mode next_page_token is empty and total_size is
+  // always populated, which costs one extra COUNT over the same filters.
+  optional int32 offset = 6;
 }
 message ListAccountsResponse {
   repeated Account accounts = 1;
+  // Keyset mode only; empty in offset mode and on the last page.
   string next_page_token = 2;
+  // Rows matching the filters, ignoring pagination. Offset mode only — it stays
+  // 0 in keyset mode, where no honest total can be produced.
+  int32 total_size = 3;
 }
 
 message SetAccountStatusRequest {
@@ -151,6 +170,19 @@ message UpsertOdooMappingRequest {
   int32 odoo_user_id = 3;
   string odoo_login = 4;
 }
+// Exactly one of account_ids / odoo_user_ids must be set — both, or neither, is
+// INVALID_ARGUMENT rather than a guess at what was meant. Max 500 ids per call.
+// Ids that match no mapping are skipped silently, so the response may be shorter
+// than the request; it is a lookup, not a page, so there is no cursor.
+message BatchGetOdooMappingsRequest {
+  string odoo_db = 1;
+  repeated string account_ids = 2;
+  repeated int32 odoo_user_ids = 3;
+}
+message BatchGetOdooMappingsResponse {
+  repeated OdooMapping mappings = 1;
+}
+
 message OdooMapping {
   string account_id = 1;
   string odoo_db = 2;
