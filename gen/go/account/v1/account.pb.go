@@ -75,6 +75,55 @@ func (AccountStatus) EnumDescriptor() ([]byte, []int) {
 	return file_account_v1_account_proto_rawDescGZIP(), []int{0}
 }
 
+type IdentityProvider int32
+
+const (
+	IdentityProvider_IDENTITY_PROVIDER_UNSPECIFIED IdentityProvider = 0
+	IdentityProvider_IDENTITY_PROVIDER_ODOO        IdentityProvider = 1 // Odoo OAuth; provider_user_id = res.users.id (decimal string)
+	IdentityProvider_IDENTITY_PROVIDER_MICROSOFT   IdentityProvider = 2 // Microsoft Entra ID; provider_user_id = the object id (oid)
+)
+
+// Enum value maps for IdentityProvider.
+var (
+	IdentityProvider_name = map[int32]string{
+		0: "IDENTITY_PROVIDER_UNSPECIFIED",
+		1: "IDENTITY_PROVIDER_ODOO",
+		2: "IDENTITY_PROVIDER_MICROSOFT",
+	}
+	IdentityProvider_value = map[string]int32{
+		"IDENTITY_PROVIDER_UNSPECIFIED": 0,
+		"IDENTITY_PROVIDER_ODOO":        1,
+		"IDENTITY_PROVIDER_MICROSOFT":   2,
+	}
+)
+
+func (x IdentityProvider) Enum() *IdentityProvider {
+	p := new(IdentityProvider)
+	*p = x
+	return p
+}
+
+func (x IdentityProvider) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (IdentityProvider) Descriptor() protoreflect.EnumDescriptor {
+	return file_account_v1_account_proto_enumTypes[1].Descriptor()
+}
+
+func (IdentityProvider) Type() protoreflect.EnumType {
+	return &file_account_v1_account_proto_enumTypes[1]
+}
+
+func (x IdentityProvider) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use IdentityProvider.Descriptor instead.
+func (IdentityProvider) EnumDescriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{1}
+}
+
 type Account struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // internal UUID — other services store FK by this value
@@ -1448,6 +1497,373 @@ func (x *AdminResetPasswordResponse) GetSessionsRevoked() bool {
 	return false
 }
 
+type LinkedIdentity struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	AccountId        string                 `protobuf:"bytes,1,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
+	Provider         IdentityProvider       `protobuf:"varint,2,opt,name=provider,proto3,enum=account.v1.IdentityProvider" json:"provider,omitempty"`
+	ProviderUserId   string                 `protobuf:"bytes,3,opt,name=provider_user_id,json=providerUserId,proto3" json:"provider_user_id,omitempty"` // see IdentityProvider for the format per provider
+	ProviderUsername string                 `protobuf:"bytes,4,opt,name=provider_username,json=providerUsername,proto3" json:"provider_username,omitempty"`
+	LinkedAt         *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=linked_at,json=linkedAt,proto3" json:"linked_at,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *LinkedIdentity) Reset() {
+	*x = LinkedIdentity{}
+	mi := &file_account_v1_account_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LinkedIdentity) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LinkedIdentity) ProtoMessage() {}
+
+func (x *LinkedIdentity) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LinkedIdentity.ProtoReflect.Descriptor instead.
+func (*LinkedIdentity) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *LinkedIdentity) GetAccountId() string {
+	if x != nil {
+		return x.AccountId
+	}
+	return ""
+}
+
+func (x *LinkedIdentity) GetProvider() IdentityProvider {
+	if x != nil {
+		return x.Provider
+	}
+	return IdentityProvider_IDENTITY_PROVIDER_UNSPECIFIED
+}
+
+func (x *LinkedIdentity) GetProviderUserId() string {
+	if x != nil {
+		return x.ProviderUserId
+	}
+	return ""
+}
+
+func (x *LinkedIdentity) GetProviderUsername() string {
+	if x != nil {
+		return x.ProviderUsername
+	}
+	return ""
+}
+
+func (x *LinkedIdentity) GetLinkedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LinkedAt
+	}
+	return nil
+}
+
+type GetLinkedIdentitiesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AccountId     string                 `protobuf:"bytes,1,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"` // required
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetLinkedIdentitiesRequest) Reset() {
+	*x = GetLinkedIdentitiesRequest{}
+	mi := &file_account_v1_account_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetLinkedIdentitiesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLinkedIdentitiesRequest) ProtoMessage() {}
+
+func (x *GetLinkedIdentitiesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLinkedIdentitiesRequest.ProtoReflect.Descriptor instead.
+func (*GetLinkedIdentitiesRequest) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GetLinkedIdentitiesRequest) GetAccountId() string {
+	if x != nil {
+		return x.AccountId
+	}
+	return ""
+}
+
+type GetLinkedIdentitiesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Identities    []*LinkedIdentity      `protobuf:"bytes,1,rep,name=identities,proto3" json:"identities,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetLinkedIdentitiesResponse) Reset() {
+	*x = GetLinkedIdentitiesResponse{}
+	mi := &file_account_v1_account_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetLinkedIdentitiesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLinkedIdentitiesResponse) ProtoMessage() {}
+
+func (x *GetLinkedIdentitiesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLinkedIdentitiesResponse.ProtoReflect.Descriptor instead.
+func (*GetLinkedIdentitiesResponse) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *GetLinkedIdentitiesResponse) GetIdentities() []*LinkedIdentity {
+	if x != nil {
+		return x.Identities
+	}
+	return nil
+}
+
+// Max 200 account_ids, like BatchGetAccounts. Accounts with no link (or no link
+// to the requested provider) are simply absent from the response; it is a
+// lookup, not a page, so there is no cursor.
+type BatchGetLinkedIdentitiesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AccountIds    []string               `protobuf:"bytes,1,rep,name=account_ids,json=accountIds,proto3" json:"account_ids,omitempty"`
+	Provider      IdentityProvider       `protobuf:"varint,2,opt,name=provider,proto3,enum=account.v1.IdentityProvider" json:"provider,omitempty"` // optional filter; UNSPECIFIED = all providers
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BatchGetLinkedIdentitiesRequest) Reset() {
+	*x = BatchGetLinkedIdentitiesRequest{}
+	mi := &file_account_v1_account_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BatchGetLinkedIdentitiesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BatchGetLinkedIdentitiesRequest) ProtoMessage() {}
+
+func (x *BatchGetLinkedIdentitiesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BatchGetLinkedIdentitiesRequest.ProtoReflect.Descriptor instead.
+func (*BatchGetLinkedIdentitiesRequest) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *BatchGetLinkedIdentitiesRequest) GetAccountIds() []string {
+	if x != nil {
+		return x.AccountIds
+	}
+	return nil
+}
+
+func (x *BatchGetLinkedIdentitiesRequest) GetProvider() IdentityProvider {
+	if x != nil {
+		return x.Provider
+	}
+	return IdentityProvider_IDENTITY_PROVIDER_UNSPECIFIED
+}
+
+type BatchGetLinkedIdentitiesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Identities    []*LinkedIdentity      `protobuf:"bytes,1,rep,name=identities,proto3" json:"identities,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BatchGetLinkedIdentitiesResponse) Reset() {
+	*x = BatchGetLinkedIdentitiesResponse{}
+	mi := &file_account_v1_account_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BatchGetLinkedIdentitiesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BatchGetLinkedIdentitiesResponse) ProtoMessage() {}
+
+func (x *BatchGetLinkedIdentitiesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BatchGetLinkedIdentitiesResponse.ProtoReflect.Descriptor instead.
+func (*BatchGetLinkedIdentitiesResponse) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *BatchGetLinkedIdentitiesResponse) GetIdentities() []*LinkedIdentity {
+	if x != nil {
+		return x.Identities
+	}
+	return nil
+}
+
+type GetAccountByIdentityRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Provider       IdentityProvider       `protobuf:"varint,1,opt,name=provider,proto3,enum=account.v1.IdentityProvider" json:"provider,omitempty"`   // required, UNSPECIFIED is INVALID_ARGUMENT
+	ProviderUserId string                 `protobuf:"bytes,2,opt,name=provider_user_id,json=providerUserId,proto3" json:"provider_user_id,omitempty"` // required
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *GetAccountByIdentityRequest) Reset() {
+	*x = GetAccountByIdentityRequest{}
+	mi := &file_account_v1_account_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAccountByIdentityRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAccountByIdentityRequest) ProtoMessage() {}
+
+func (x *GetAccountByIdentityRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAccountByIdentityRequest.ProtoReflect.Descriptor instead.
+func (*GetAccountByIdentityRequest) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *GetAccountByIdentityRequest) GetProvider() IdentityProvider {
+	if x != nil {
+		return x.Provider
+	}
+	return IdentityProvider_IDENTITY_PROVIDER_UNSPECIFIED
+}
+
+func (x *GetAccountByIdentityRequest) GetProviderUserId() string {
+	if x != nil {
+		return x.ProviderUserId
+	}
+	return ""
+}
+
+type GetAccountByIdentityResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Account       *Account               `protobuf:"bytes,1,opt,name=account,proto3" json:"account,omitempty"`
+	Identity      *LinkedIdentity        `protobuf:"bytes,2,opt,name=identity,proto3" json:"identity,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAccountByIdentityResponse) Reset() {
+	*x = GetAccountByIdentityResponse{}
+	mi := &file_account_v1_account_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAccountByIdentityResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAccountByIdentityResponse) ProtoMessage() {}
+
+func (x *GetAccountByIdentityResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_account_v1_account_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAccountByIdentityResponse.ProtoReflect.Descriptor instead.
+func (*GetAccountByIdentityResponse) Descriptor() ([]byte, []int) {
+	return file_account_v1_account_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *GetAccountByIdentityResponse) GetAccount() *Account {
+	if x != nil {
+		return x.Account
+	}
+	return nil
+}
+
+func (x *GetAccountByIdentityResponse) GetIdentity() *LinkedIdentity {
+	if x != nil {
+		return x.Identity
+	}
+	return nil
+}
+
 var File_account_v1_account_proto protoreflect.FileDescriptor
 
 const file_account_v1_account_proto_rawDesc = "" +
@@ -1572,12 +1988,44 @@ const file_account_v1_account_proto_rawDesc = "" +
 	"\ttemporary\x18\x03 \x01(\bR\ttemporary\x12\x16\n" +
 	"\x06reason\x18\x04 \x01(\tR\x06reason\"G\n" +
 	"\x1aAdminResetPasswordResponse\x12)\n" +
-	"\x10sessions_revoked\x18\x01 \x01(\bR\x0fsessionsRevoked*\x88\x01\n" +
+	"\x10sessions_revoked\x18\x01 \x01(\bR\x0fsessionsRevoked\"\xf9\x01\n" +
+	"\x0eLinkedIdentity\x12\x1d\n" +
+	"\n" +
+	"account_id\x18\x01 \x01(\tR\taccountId\x128\n" +
+	"\bprovider\x18\x02 \x01(\x0e2\x1c.account.v1.IdentityProviderR\bprovider\x12(\n" +
+	"\x10provider_user_id\x18\x03 \x01(\tR\x0eproviderUserId\x12+\n" +
+	"\x11provider_username\x18\x04 \x01(\tR\x10providerUsername\x127\n" +
+	"\tlinked_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\blinkedAt\";\n" +
+	"\x1aGetLinkedIdentitiesRequest\x12\x1d\n" +
+	"\n" +
+	"account_id\x18\x01 \x01(\tR\taccountId\"Y\n" +
+	"\x1bGetLinkedIdentitiesResponse\x12:\n" +
+	"\n" +
+	"identities\x18\x01 \x03(\v2\x1a.account.v1.LinkedIdentityR\n" +
+	"identities\"|\n" +
+	"\x1fBatchGetLinkedIdentitiesRequest\x12\x1f\n" +
+	"\vaccount_ids\x18\x01 \x03(\tR\n" +
+	"accountIds\x128\n" +
+	"\bprovider\x18\x02 \x01(\x0e2\x1c.account.v1.IdentityProviderR\bprovider\"^\n" +
+	" BatchGetLinkedIdentitiesResponse\x12:\n" +
+	"\n" +
+	"identities\x18\x01 \x03(\v2\x1a.account.v1.LinkedIdentityR\n" +
+	"identities\"\x81\x01\n" +
+	"\x1bGetAccountByIdentityRequest\x128\n" +
+	"\bprovider\x18\x01 \x01(\x0e2\x1c.account.v1.IdentityProviderR\bprovider\x12(\n" +
+	"\x10provider_user_id\x18\x02 \x01(\tR\x0eproviderUserId\"\x85\x01\n" +
+	"\x1cGetAccountByIdentityResponse\x12-\n" +
+	"\aaccount\x18\x01 \x01(\v2\x13.account.v1.AccountR\aaccount\x126\n" +
+	"\bidentity\x18\x02 \x01(\v2\x1a.account.v1.LinkedIdentityR\bidentity*\x88\x01\n" +
 	"\rAccountStatus\x12\x1e\n" +
 	"\x1aACCOUNT_STATUS_UNSPECIFIED\x10\x00\x12\x19\n" +
 	"\x15ACCOUNT_STATUS_ACTIVE\x10\x01\x12\x1c\n" +
 	"\x18ACCOUNT_STATUS_SUSPENDED\x10\x02\x12\x1e\n" +
-	"\x1aACCOUNT_STATUS_DEACTIVATED\x10\x032\xa0\x05\n" +
+	"\x1aACCOUNT_STATUS_DEACTIVATED\x10\x03*r\n" +
+	"\x10IdentityProvider\x12!\n" +
+	"\x1dIDENTITY_PROVIDER_UNSPECIFIED\x10\x00\x12\x1a\n" +
+	"\x16IDENTITY_PROVIDER_ODOO\x10\x01\x12\x1f\n" +
+	"\x1bIDENTITY_PROVIDER_MICROSOFT\x10\x022\xea\a\n" +
 	"\x0eAccountService\x12@\n" +
 	"\n" +
 	"GetAccount\x12\x1d.account.v1.GetAccountRequest\x1a\x13.account.v1.Account\x12]\n" +
@@ -1587,7 +2035,10 @@ const file_account_v1_account_proto_rawDesc = "" +
 	"\fListAccounts\x12\x1f.account.v1.ListAccountsRequest\x1a .account.v1.ListAccountsResponse\x12L\n" +
 	"\x10SetAccountStatus\x12#.account.v1.SetAccountStatusRequest\x1a\x13.account.v1.Account\x12W\n" +
 	"\x0eChangePassword\x12!.account.v1.ChangePasswordRequest\x1a\".account.v1.ChangePasswordResponse\x12c\n" +
-	"\x12AdminResetPassword\x12%.account.v1.AdminResetPasswordRequest\x1a&.account.v1.AdminResetPasswordResponse2\xf7\x02\n" +
+	"\x12AdminResetPassword\x12%.account.v1.AdminResetPasswordRequest\x1a&.account.v1.AdminResetPasswordResponse\x12f\n" +
+	"\x13GetLinkedIdentities\x12&.account.v1.GetLinkedIdentitiesRequest\x1a'.account.v1.GetLinkedIdentitiesResponse\x12u\n" +
+	"\x18BatchGetLinkedIdentities\x12+.account.v1.BatchGetLinkedIdentitiesRequest\x1a,.account.v1.BatchGetLinkedIdentitiesResponse\x12i\n" +
+	"\x14GetAccountByIdentity\x12'.account.v1.GetAccountByIdentityRequest\x1a(.account.v1.GetAccountByIdentityResponse2\xf7\x02\n" +
 	"\x12OdooMappingService\x12T\n" +
 	"\x14GetAccountByOdooUser\x12'.account.v1.GetAccountByOdooUserRequest\x1a\x13.account.v1.Account\x12L\n" +
 	"\x0eGetOdooMapping\x12!.account.v1.GetOdooMappingRequest\x1a\x17.account.v1.OdooMapping\x12R\n" +
@@ -1606,79 +2057,101 @@ func file_account_v1_account_proto_rawDescGZIP() []byte {
 	return file_account_v1_account_proto_rawDescData
 }
 
-var file_account_v1_account_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_account_v1_account_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_account_v1_account_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_account_v1_account_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_account_v1_account_proto_goTypes = []any{
-	(AccountStatus)(0),                   // 0: account.v1.AccountStatus
-	(*Account)(nil),                      // 1: account.v1.Account
-	(*Profile)(nil),                      // 2: account.v1.Profile
-	(*GetAccountRequest)(nil),            // 3: account.v1.GetAccountRequest
-	(*BatchGetAccountsRequest)(nil),      // 4: account.v1.BatchGetAccountsRequest
-	(*BatchGetAccountsResponse)(nil),     // 5: account.v1.BatchGetAccountsResponse
-	(*EnsureAccountRequest)(nil),         // 6: account.v1.EnsureAccountRequest
-	(*OdooHint)(nil),                     // 7: account.v1.OdooHint
-	(*UpdateProfileRequest)(nil),         // 8: account.v1.UpdateProfileRequest
-	(*ListAccountsRequest)(nil),          // 9: account.v1.ListAccountsRequest
-	(*ListAccountsResponse)(nil),         // 10: account.v1.ListAccountsResponse
-	(*SetAccountStatusRequest)(nil),      // 11: account.v1.SetAccountStatusRequest
-	(*GetAccountByOdooUserRequest)(nil),  // 12: account.v1.GetAccountByOdooUserRequest
-	(*GetOdooMappingRequest)(nil),        // 13: account.v1.GetOdooMappingRequest
-	(*UpsertOdooMappingRequest)(nil),     // 14: account.v1.UpsertOdooMappingRequest
-	(*BatchGetOdooMappingsRequest)(nil),  // 15: account.v1.BatchGetOdooMappingsRequest
-	(*BatchGetOdooMappingsResponse)(nil), // 16: account.v1.BatchGetOdooMappingsResponse
-	(*OdooMapping)(nil),                  // 17: account.v1.OdooMapping
-	(*ChangePasswordRequest)(nil),        // 18: account.v1.ChangePasswordRequest
-	(*ChangePasswordResponse)(nil),       // 19: account.v1.ChangePasswordResponse
-	(*AdminResetPasswordRequest)(nil),    // 20: account.v1.AdminResetPasswordRequest
-	(*AdminResetPasswordResponse)(nil),   // 21: account.v1.AdminResetPasswordResponse
-	nil,                                  // 22: account.v1.Profile.AttributesEntry
-	(*timestamppb.Timestamp)(nil),        // 23: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),        // 24: google.protobuf.FieldMask
+	(AccountStatus)(0),                       // 0: account.v1.AccountStatus
+	(IdentityProvider)(0),                    // 1: account.v1.IdentityProvider
+	(*Account)(nil),                          // 2: account.v1.Account
+	(*Profile)(nil),                          // 3: account.v1.Profile
+	(*GetAccountRequest)(nil),                // 4: account.v1.GetAccountRequest
+	(*BatchGetAccountsRequest)(nil),          // 5: account.v1.BatchGetAccountsRequest
+	(*BatchGetAccountsResponse)(nil),         // 6: account.v1.BatchGetAccountsResponse
+	(*EnsureAccountRequest)(nil),             // 7: account.v1.EnsureAccountRequest
+	(*OdooHint)(nil),                         // 8: account.v1.OdooHint
+	(*UpdateProfileRequest)(nil),             // 9: account.v1.UpdateProfileRequest
+	(*ListAccountsRequest)(nil),              // 10: account.v1.ListAccountsRequest
+	(*ListAccountsResponse)(nil),             // 11: account.v1.ListAccountsResponse
+	(*SetAccountStatusRequest)(nil),          // 12: account.v1.SetAccountStatusRequest
+	(*GetAccountByOdooUserRequest)(nil),      // 13: account.v1.GetAccountByOdooUserRequest
+	(*GetOdooMappingRequest)(nil),            // 14: account.v1.GetOdooMappingRequest
+	(*UpsertOdooMappingRequest)(nil),         // 15: account.v1.UpsertOdooMappingRequest
+	(*BatchGetOdooMappingsRequest)(nil),      // 16: account.v1.BatchGetOdooMappingsRequest
+	(*BatchGetOdooMappingsResponse)(nil),     // 17: account.v1.BatchGetOdooMappingsResponse
+	(*OdooMapping)(nil),                      // 18: account.v1.OdooMapping
+	(*ChangePasswordRequest)(nil),            // 19: account.v1.ChangePasswordRequest
+	(*ChangePasswordResponse)(nil),           // 20: account.v1.ChangePasswordResponse
+	(*AdminResetPasswordRequest)(nil),        // 21: account.v1.AdminResetPasswordRequest
+	(*AdminResetPasswordResponse)(nil),       // 22: account.v1.AdminResetPasswordResponse
+	(*LinkedIdentity)(nil),                   // 23: account.v1.LinkedIdentity
+	(*GetLinkedIdentitiesRequest)(nil),       // 24: account.v1.GetLinkedIdentitiesRequest
+	(*GetLinkedIdentitiesResponse)(nil),      // 25: account.v1.GetLinkedIdentitiesResponse
+	(*BatchGetLinkedIdentitiesRequest)(nil),  // 26: account.v1.BatchGetLinkedIdentitiesRequest
+	(*BatchGetLinkedIdentitiesResponse)(nil), // 27: account.v1.BatchGetLinkedIdentitiesResponse
+	(*GetAccountByIdentityRequest)(nil),      // 28: account.v1.GetAccountByIdentityRequest
+	(*GetAccountByIdentityResponse)(nil),     // 29: account.v1.GetAccountByIdentityResponse
+	nil,                                      // 30: account.v1.Profile.AttributesEntry
+	(*timestamppb.Timestamp)(nil),            // 31: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),            // 32: google.protobuf.FieldMask
 }
 var file_account_v1_account_proto_depIdxs = []int32{
 	0,  // 0: account.v1.Account.status:type_name -> account.v1.AccountStatus
-	2,  // 1: account.v1.Account.profile:type_name -> account.v1.Profile
-	23, // 2: account.v1.Account.created_at:type_name -> google.protobuf.Timestamp
-	23, // 3: account.v1.Account.updated_at:type_name -> google.protobuf.Timestamp
-	22, // 4: account.v1.Profile.attributes:type_name -> account.v1.Profile.AttributesEntry
-	1,  // 5: account.v1.BatchGetAccountsResponse.accounts:type_name -> account.v1.Account
-	7,  // 6: account.v1.EnsureAccountRequest.odoo_hint:type_name -> account.v1.OdooHint
-	2,  // 7: account.v1.UpdateProfileRequest.profile:type_name -> account.v1.Profile
-	24, // 8: account.v1.UpdateProfileRequest.update_mask:type_name -> google.protobuf.FieldMask
+	3,  // 1: account.v1.Account.profile:type_name -> account.v1.Profile
+	31, // 2: account.v1.Account.created_at:type_name -> google.protobuf.Timestamp
+	31, // 3: account.v1.Account.updated_at:type_name -> google.protobuf.Timestamp
+	30, // 4: account.v1.Profile.attributes:type_name -> account.v1.Profile.AttributesEntry
+	2,  // 5: account.v1.BatchGetAccountsResponse.accounts:type_name -> account.v1.Account
+	8,  // 6: account.v1.EnsureAccountRequest.odoo_hint:type_name -> account.v1.OdooHint
+	3,  // 7: account.v1.UpdateProfileRequest.profile:type_name -> account.v1.Profile
+	32, // 8: account.v1.UpdateProfileRequest.update_mask:type_name -> google.protobuf.FieldMask
 	0,  // 9: account.v1.ListAccountsRequest.status:type_name -> account.v1.AccountStatus
-	1,  // 10: account.v1.ListAccountsResponse.accounts:type_name -> account.v1.Account
+	2,  // 10: account.v1.ListAccountsResponse.accounts:type_name -> account.v1.Account
 	0,  // 11: account.v1.SetAccountStatusRequest.status:type_name -> account.v1.AccountStatus
-	17, // 12: account.v1.BatchGetOdooMappingsResponse.mappings:type_name -> account.v1.OdooMapping
-	23, // 13: account.v1.OdooMapping.synced_at:type_name -> google.protobuf.Timestamp
-	3,  // 14: account.v1.AccountService.GetAccount:input_type -> account.v1.GetAccountRequest
-	4,  // 15: account.v1.AccountService.BatchGetAccounts:input_type -> account.v1.BatchGetAccountsRequest
-	6,  // 16: account.v1.AccountService.EnsureAccount:input_type -> account.v1.EnsureAccountRequest
-	8,  // 17: account.v1.AccountService.UpdateProfile:input_type -> account.v1.UpdateProfileRequest
-	9,  // 18: account.v1.AccountService.ListAccounts:input_type -> account.v1.ListAccountsRequest
-	11, // 19: account.v1.AccountService.SetAccountStatus:input_type -> account.v1.SetAccountStatusRequest
-	18, // 20: account.v1.AccountService.ChangePassword:input_type -> account.v1.ChangePasswordRequest
-	20, // 21: account.v1.AccountService.AdminResetPassword:input_type -> account.v1.AdminResetPasswordRequest
-	12, // 22: account.v1.OdooMappingService.GetAccountByOdooUser:input_type -> account.v1.GetAccountByOdooUserRequest
-	13, // 23: account.v1.OdooMappingService.GetOdooMapping:input_type -> account.v1.GetOdooMappingRequest
-	14, // 24: account.v1.OdooMappingService.UpsertOdooMapping:input_type -> account.v1.UpsertOdooMappingRequest
-	15, // 25: account.v1.OdooMappingService.BatchGetOdooMappings:input_type -> account.v1.BatchGetOdooMappingsRequest
-	1,  // 26: account.v1.AccountService.GetAccount:output_type -> account.v1.Account
-	5,  // 27: account.v1.AccountService.BatchGetAccounts:output_type -> account.v1.BatchGetAccountsResponse
-	1,  // 28: account.v1.AccountService.EnsureAccount:output_type -> account.v1.Account
-	1,  // 29: account.v1.AccountService.UpdateProfile:output_type -> account.v1.Account
-	10, // 30: account.v1.AccountService.ListAccounts:output_type -> account.v1.ListAccountsResponse
-	1,  // 31: account.v1.AccountService.SetAccountStatus:output_type -> account.v1.Account
-	19, // 32: account.v1.AccountService.ChangePassword:output_type -> account.v1.ChangePasswordResponse
-	21, // 33: account.v1.AccountService.AdminResetPassword:output_type -> account.v1.AdminResetPasswordResponse
-	1,  // 34: account.v1.OdooMappingService.GetAccountByOdooUser:output_type -> account.v1.Account
-	17, // 35: account.v1.OdooMappingService.GetOdooMapping:output_type -> account.v1.OdooMapping
-	17, // 36: account.v1.OdooMappingService.UpsertOdooMapping:output_type -> account.v1.OdooMapping
-	16, // 37: account.v1.OdooMappingService.BatchGetOdooMappings:output_type -> account.v1.BatchGetOdooMappingsResponse
-	26, // [26:38] is the sub-list for method output_type
-	14, // [14:26] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	18, // 12: account.v1.BatchGetOdooMappingsResponse.mappings:type_name -> account.v1.OdooMapping
+	31, // 13: account.v1.OdooMapping.synced_at:type_name -> google.protobuf.Timestamp
+	1,  // 14: account.v1.LinkedIdentity.provider:type_name -> account.v1.IdentityProvider
+	31, // 15: account.v1.LinkedIdentity.linked_at:type_name -> google.protobuf.Timestamp
+	23, // 16: account.v1.GetLinkedIdentitiesResponse.identities:type_name -> account.v1.LinkedIdentity
+	1,  // 17: account.v1.BatchGetLinkedIdentitiesRequest.provider:type_name -> account.v1.IdentityProvider
+	23, // 18: account.v1.BatchGetLinkedIdentitiesResponse.identities:type_name -> account.v1.LinkedIdentity
+	1,  // 19: account.v1.GetAccountByIdentityRequest.provider:type_name -> account.v1.IdentityProvider
+	2,  // 20: account.v1.GetAccountByIdentityResponse.account:type_name -> account.v1.Account
+	23, // 21: account.v1.GetAccountByIdentityResponse.identity:type_name -> account.v1.LinkedIdentity
+	4,  // 22: account.v1.AccountService.GetAccount:input_type -> account.v1.GetAccountRequest
+	5,  // 23: account.v1.AccountService.BatchGetAccounts:input_type -> account.v1.BatchGetAccountsRequest
+	7,  // 24: account.v1.AccountService.EnsureAccount:input_type -> account.v1.EnsureAccountRequest
+	9,  // 25: account.v1.AccountService.UpdateProfile:input_type -> account.v1.UpdateProfileRequest
+	10, // 26: account.v1.AccountService.ListAccounts:input_type -> account.v1.ListAccountsRequest
+	12, // 27: account.v1.AccountService.SetAccountStatus:input_type -> account.v1.SetAccountStatusRequest
+	19, // 28: account.v1.AccountService.ChangePassword:input_type -> account.v1.ChangePasswordRequest
+	21, // 29: account.v1.AccountService.AdminResetPassword:input_type -> account.v1.AdminResetPasswordRequest
+	24, // 30: account.v1.AccountService.GetLinkedIdentities:input_type -> account.v1.GetLinkedIdentitiesRequest
+	26, // 31: account.v1.AccountService.BatchGetLinkedIdentities:input_type -> account.v1.BatchGetLinkedIdentitiesRequest
+	28, // 32: account.v1.AccountService.GetAccountByIdentity:input_type -> account.v1.GetAccountByIdentityRequest
+	13, // 33: account.v1.OdooMappingService.GetAccountByOdooUser:input_type -> account.v1.GetAccountByOdooUserRequest
+	14, // 34: account.v1.OdooMappingService.GetOdooMapping:input_type -> account.v1.GetOdooMappingRequest
+	15, // 35: account.v1.OdooMappingService.UpsertOdooMapping:input_type -> account.v1.UpsertOdooMappingRequest
+	16, // 36: account.v1.OdooMappingService.BatchGetOdooMappings:input_type -> account.v1.BatchGetOdooMappingsRequest
+	2,  // 37: account.v1.AccountService.GetAccount:output_type -> account.v1.Account
+	6,  // 38: account.v1.AccountService.BatchGetAccounts:output_type -> account.v1.BatchGetAccountsResponse
+	2,  // 39: account.v1.AccountService.EnsureAccount:output_type -> account.v1.Account
+	2,  // 40: account.v1.AccountService.UpdateProfile:output_type -> account.v1.Account
+	11, // 41: account.v1.AccountService.ListAccounts:output_type -> account.v1.ListAccountsResponse
+	2,  // 42: account.v1.AccountService.SetAccountStatus:output_type -> account.v1.Account
+	20, // 43: account.v1.AccountService.ChangePassword:output_type -> account.v1.ChangePasswordResponse
+	22, // 44: account.v1.AccountService.AdminResetPassword:output_type -> account.v1.AdminResetPasswordResponse
+	25, // 45: account.v1.AccountService.GetLinkedIdentities:output_type -> account.v1.GetLinkedIdentitiesResponse
+	27, // 46: account.v1.AccountService.BatchGetLinkedIdentities:output_type -> account.v1.BatchGetLinkedIdentitiesResponse
+	29, // 47: account.v1.AccountService.GetAccountByIdentity:output_type -> account.v1.GetAccountByIdentityResponse
+	2,  // 48: account.v1.OdooMappingService.GetAccountByOdooUser:output_type -> account.v1.Account
+	18, // 49: account.v1.OdooMappingService.GetOdooMapping:output_type -> account.v1.OdooMapping
+	18, // 50: account.v1.OdooMappingService.UpsertOdooMapping:output_type -> account.v1.OdooMapping
+	17, // 51: account.v1.OdooMappingService.BatchGetOdooMappings:output_type -> account.v1.BatchGetOdooMappingsResponse
+	37, // [37:52] is the sub-list for method output_type
+	22, // [22:37] is the sub-list for method input_type
+	22, // [22:22] is the sub-list for extension type_name
+	22, // [22:22] is the sub-list for extension extendee
+	0,  // [0:22] is the sub-list for field type_name
 }
 
 func init() { file_account_v1_account_proto_init() }
@@ -1698,8 +2171,8 @@ func file_account_v1_account_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_account_v1_account_proto_rawDesc), len(file_account_v1_account_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   22,
+			NumEnums:      2,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

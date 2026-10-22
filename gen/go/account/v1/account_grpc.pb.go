@@ -19,14 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AccountService_GetAccount_FullMethodName         = "/account.v1.AccountService/GetAccount"
-	AccountService_BatchGetAccounts_FullMethodName   = "/account.v1.AccountService/BatchGetAccounts"
-	AccountService_EnsureAccount_FullMethodName      = "/account.v1.AccountService/EnsureAccount"
-	AccountService_UpdateProfile_FullMethodName      = "/account.v1.AccountService/UpdateProfile"
-	AccountService_ListAccounts_FullMethodName       = "/account.v1.AccountService/ListAccounts"
-	AccountService_SetAccountStatus_FullMethodName   = "/account.v1.AccountService/SetAccountStatus"
-	AccountService_ChangePassword_FullMethodName     = "/account.v1.AccountService/ChangePassword"
-	AccountService_AdminResetPassword_FullMethodName = "/account.v1.AccountService/AdminResetPassword"
+	AccountService_GetAccount_FullMethodName               = "/account.v1.AccountService/GetAccount"
+	AccountService_BatchGetAccounts_FullMethodName         = "/account.v1.AccountService/BatchGetAccounts"
+	AccountService_EnsureAccount_FullMethodName            = "/account.v1.AccountService/EnsureAccount"
+	AccountService_UpdateProfile_FullMethodName            = "/account.v1.AccountService/UpdateProfile"
+	AccountService_ListAccounts_FullMethodName             = "/account.v1.AccountService/ListAccounts"
+	AccountService_SetAccountStatus_FullMethodName         = "/account.v1.AccountService/SetAccountStatus"
+	AccountService_ChangePassword_FullMethodName           = "/account.v1.AccountService/ChangePassword"
+	AccountService_AdminResetPassword_FullMethodName       = "/account.v1.AccountService/AdminResetPassword"
+	AccountService_GetLinkedIdentities_FullMethodName      = "/account.v1.AccountService/GetLinkedIdentities"
+	AccountService_BatchGetLinkedIdentities_FullMethodName = "/account.v1.AccountService/BatchGetLinkedIdentities"
+	AccountService_GetAccountByIdentity_FullMethodName     = "/account.v1.AccountService/GetAccountByIdentity"
 )
 
 // AccountServiceClient is the client API for AccountService service.
@@ -56,6 +59,15 @@ type AccountServiceClient interface {
 	// Privileged reset of ANOTHER user's password (helpdesk). Requires the realm
 	// role "account-admin"; set temporary to force a change at next login.
 	AdminResetPassword(ctx context.Context, in *AdminResetPasswordRequest, opts ...grpc.CallOption) (*AdminResetPasswordResponse, error)
+	// Identity providers linked to one account (Keycloak identity brokering).
+	// An account with no links returns an empty list, not NOT_FOUND.
+	GetLinkedIdentities(ctx context.Context, in *GetLinkedIdentitiesRequest, opts ...grpc.CallOption) (*GetLinkedIdentitiesResponse, error)
+	// Batch form of GetLinkedIdentities, so a caller hydrating a page of accounts
+	// makes one call instead of one per row.
+	BatchGetLinkedIdentities(ctx context.Context, in *BatchGetLinkedIdentitiesRequest, opts ...grpc.CallOption) (*BatchGetLinkedIdentitiesResponse, error)
+	// Reverse lookup: the account linked to a provider's user id. NOT_FOUND when
+	// no account is linked to it.
+	GetAccountByIdentity(ctx context.Context, in *GetAccountByIdentityRequest, opts ...grpc.CallOption) (*GetAccountByIdentityResponse, error)
 }
 
 type accountServiceClient struct {
@@ -146,6 +158,36 @@ func (c *accountServiceClient) AdminResetPassword(ctx context.Context, in *Admin
 	return out, nil
 }
 
+func (c *accountServiceClient) GetLinkedIdentities(ctx context.Context, in *GetLinkedIdentitiesRequest, opts ...grpc.CallOption) (*GetLinkedIdentitiesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetLinkedIdentitiesResponse)
+	err := c.cc.Invoke(ctx, AccountService_GetLinkedIdentities_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountServiceClient) BatchGetLinkedIdentities(ctx context.Context, in *BatchGetLinkedIdentitiesRequest, opts ...grpc.CallOption) (*BatchGetLinkedIdentitiesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BatchGetLinkedIdentitiesResponse)
+	err := c.cc.Invoke(ctx, AccountService_BatchGetLinkedIdentities_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountServiceClient) GetAccountByIdentity(ctx context.Context, in *GetAccountByIdentityRequest, opts ...grpc.CallOption) (*GetAccountByIdentityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAccountByIdentityResponse)
+	err := c.cc.Invoke(ctx, AccountService_GetAccountByIdentity_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AccountServiceServer is the server API for AccountService service.
 // All implementations must embed UnimplementedAccountServiceServer
 // for forward compatibility.
@@ -173,6 +215,15 @@ type AccountServiceServer interface {
 	// Privileged reset of ANOTHER user's password (helpdesk). Requires the realm
 	// role "account-admin"; set temporary to force a change at next login.
 	AdminResetPassword(context.Context, *AdminResetPasswordRequest) (*AdminResetPasswordResponse, error)
+	// Identity providers linked to one account (Keycloak identity brokering).
+	// An account with no links returns an empty list, not NOT_FOUND.
+	GetLinkedIdentities(context.Context, *GetLinkedIdentitiesRequest) (*GetLinkedIdentitiesResponse, error)
+	// Batch form of GetLinkedIdentities, so a caller hydrating a page of accounts
+	// makes one call instead of one per row.
+	BatchGetLinkedIdentities(context.Context, *BatchGetLinkedIdentitiesRequest) (*BatchGetLinkedIdentitiesResponse, error)
+	// Reverse lookup: the account linked to a provider's user id. NOT_FOUND when
+	// no account is linked to it.
+	GetAccountByIdentity(context.Context, *GetAccountByIdentityRequest) (*GetAccountByIdentityResponse, error)
 	mustEmbedUnimplementedAccountServiceServer()
 }
 
@@ -206,6 +257,15 @@ func (UnimplementedAccountServiceServer) ChangePassword(context.Context, *Change
 }
 func (UnimplementedAccountServiceServer) AdminResetPassword(context.Context, *AdminResetPasswordRequest) (*AdminResetPasswordResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method AdminResetPassword not implemented")
+}
+func (UnimplementedAccountServiceServer) GetLinkedIdentities(context.Context, *GetLinkedIdentitiesRequest) (*GetLinkedIdentitiesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetLinkedIdentities not implemented")
+}
+func (UnimplementedAccountServiceServer) BatchGetLinkedIdentities(context.Context, *BatchGetLinkedIdentitiesRequest) (*BatchGetLinkedIdentitiesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method BatchGetLinkedIdentities not implemented")
+}
+func (UnimplementedAccountServiceServer) GetAccountByIdentity(context.Context, *GetAccountByIdentityRequest) (*GetAccountByIdentityResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAccountByIdentity not implemented")
 }
 func (UnimplementedAccountServiceServer) mustEmbedUnimplementedAccountServiceServer() {}
 func (UnimplementedAccountServiceServer) testEmbeddedByValue()                        {}
@@ -372,6 +432,60 @@ func _AccountService_AdminResetPassword_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AccountService_GetLinkedIdentities_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLinkedIdentitiesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccountServiceServer).GetLinkedIdentities(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AccountService_GetLinkedIdentities_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccountServiceServer).GetLinkedIdentities(ctx, req.(*GetLinkedIdentitiesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AccountService_BatchGetLinkedIdentities_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchGetLinkedIdentitiesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccountServiceServer).BatchGetLinkedIdentities(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AccountService_BatchGetLinkedIdentities_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccountServiceServer).BatchGetLinkedIdentities(ctx, req.(*BatchGetLinkedIdentitiesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AccountService_GetAccountByIdentity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAccountByIdentityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccountServiceServer).GetAccountByIdentity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AccountService_GetAccountByIdentity_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccountServiceServer).GetAccountByIdentity(ctx, req.(*GetAccountByIdentityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AccountService_ServiceDesc is the grpc.ServiceDesc for AccountService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -410,6 +524,18 @@ var AccountService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AdminResetPassword",
 			Handler:    _AccountService_AdminResetPassword_Handler,
+		},
+		{
+			MethodName: "GetLinkedIdentities",
+			Handler:    _AccountService_GetLinkedIdentities_Handler,
+		},
+		{
+			MethodName: "BatchGetLinkedIdentities",
+			Handler:    _AccountService_BatchGetLinkedIdentities_Handler,
+		},
+		{
+			MethodName: "GetAccountByIdentity",
+			Handler:    _AccountService_GetAccountByIdentity_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

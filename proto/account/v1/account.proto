@@ -37,6 +37,18 @@ service AccountService {
   // Privileged reset of ANOTHER user's password (helpdesk). Requires the realm
   // role "account-admin"; set temporary to force a change at next login.
   rpc AdminResetPassword(AdminResetPasswordRequest) returns (AdminResetPasswordResponse);
+
+  // Identity providers linked to one account (Keycloak identity brokering).
+  // An account with no links returns an empty list, not NOT_FOUND.
+  rpc GetLinkedIdentities(GetLinkedIdentitiesRequest) returns (GetLinkedIdentitiesResponse);
+
+  // Batch form of GetLinkedIdentities, so a caller hydrating a page of accounts
+  // makes one call instead of one per row.
+  rpc BatchGetLinkedIdentities(BatchGetLinkedIdentitiesRequest) returns (BatchGetLinkedIdentitiesResponse);
+
+  // Reverse lookup: the account linked to a provider's user id. NOT_FOUND when
+  // no account is linked to it.
+  rpc GetAccountByIdentity(GetAccountByIdentityRequest) returns (GetAccountByIdentityResponse);
 }
 
 // OdooMappingService is deliberately separate so it can be removed cleanly once
@@ -215,4 +227,47 @@ message AdminResetPasswordRequest {
 }
 message AdminResetPasswordResponse {
   bool sessions_revoked = 1;
+}
+
+// --- linked identities ---
+
+enum IdentityProvider {
+  IDENTITY_PROVIDER_UNSPECIFIED = 0;
+  IDENTITY_PROVIDER_ODOO = 1;      // Odoo OAuth; provider_user_id = res.users.id (decimal string)
+  IDENTITY_PROVIDER_MICROSOFT = 2; // Microsoft Entra ID; provider_user_id = the object id (oid)
+}
+
+message LinkedIdentity {
+  string account_id = 1;
+  IdentityProvider provider = 2;
+  string provider_user_id = 3; // see IdentityProvider for the format per provider
+  string provider_username = 4;
+  google.protobuf.Timestamp linked_at = 5;
+}
+
+message GetLinkedIdentitiesRequest {
+  string account_id = 1; // required
+}
+message GetLinkedIdentitiesResponse {
+  repeated LinkedIdentity identities = 1;
+}
+
+// Max 200 account_ids, like BatchGetAccounts. Accounts with no link (or no link
+// to the requested provider) are simply absent from the response; it is a
+// lookup, not a page, so there is no cursor.
+message BatchGetLinkedIdentitiesRequest {
+  repeated string account_ids = 1;
+  IdentityProvider provider = 2; // optional filter; UNSPECIFIED = all providers
+}
+message BatchGetLinkedIdentitiesResponse {
+  repeated LinkedIdentity identities = 1;
+}
+
+message GetAccountByIdentityRequest {
+  IdentityProvider provider = 1;  // required, UNSPECIFIED is INVALID_ARGUMENT
+  string provider_user_id = 2;    // required
+}
+message GetAccountByIdentityResponse {
+  Account account = 1;
+  LinkedIdentity identity = 2;
 }
